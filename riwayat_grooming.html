@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Riwayat Transaksi Grooming - Kasir Pet Shop</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <!-- CSS DASHBOARD (TIDAK DIUBAH) -->
+  <style>
+    :root {
+      --app-bg: #f6f7fb;
+      --card-radius: 16px;
+      --sidebar-w: 280px;
+    }
+    body { background: var(--app-bg); }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: #fff;
+      border-right: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 18px 14px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .brand .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: #f1f5ff;
+      color: #2b5cff;
+      font-weight: 700;
+    }
+
+    .nav-pill {
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #3a3f4b;
+      text-decoration: none;
+    }
+
+    .nav-pill:hover { background: rgba(43, 92, 255, 0.08); }
+
+    .nav-pill.active {
+      background: rgba(43, 92, 255, 0.12);
+      color: #1f4bff;
+      font-weight: 600;
+    }
+
+    .nav-section-title {
+      font-size: 0.78rem;
+      color: #6c757d;
+      letter-spacing: 0.08em;
+      margin: 18px 10px 8px;
+      text-transform: uppercase;
+    }
+
+    .content {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-width: 0;
+    }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 14px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .search { max-width: 520px; }
+
+    .search .form-control {
+      border-radius: 12px;
+      padding-left: 40px;
+    }
+
+    .search .bi-search {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+    }
+
+    .page { padding: 18px; }
+
+    .soft-card {
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: var(--card-radius);
+      box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+      background: #fff;
+    }
+
+    .stat {
+      border-radius: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: linear-gradient(180deg, #fff, #fbfcff);
+    }
+
+    .module-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: #f3f6ff;
+      color: #2b5cff;
+      font-size: 1.25rem;
+    }
+
+    @media (max-width: 992px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: relative; height: auto; }
+    }
+  </style>
+
+  <!-- STYLE TAMBAHAN KHUSUS RIWAYAT (BOLEH, TIDAK MENGUBAH CSS DASHBOARD) -->
+  <style>
+    tr.row-click { cursor: pointer; }
+    tr.row-click:hover { background: rgba(43, 92, 255, 0.06); }
+
+    .detail-block-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .kv {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+    .kv .k { color: #6c757d; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- SIDEBAR (TETAP, JANGAN DIUBAH) -->
+    <aside class="sidebar">
+      <div class="brand mb-2">
+        <div class="logo">PS</div>
+        <div class="w-100">
+          <div class="fw-semibold">Pet Shop Kasir</div>
+          <div class="text-muted small">Dashboard</div>
+        </div>
+      </div>
+
+         <div class="nav-section-title">Menu Kasir</div>
+      <nav class="d-grid gap-1">
+        <a class="nav-pill" href="dashboard-kasir.html"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a class="nav-pill" href="transaksi.html"><i class="bi bi-cart-check"></i> Transaksi (Kasir)</a>
+        <a class="nav-pill" href="produk.html"><i class="bi bi-box-seam"></i> Produk</a>
+        <a class="nav-pill" href="riwayat-transaksi.html"><i class="bi bi-clock-history"></i> Riwayat Transaksi</a>
+        <a class="nav-pill" href="pelanggan.html"><i class="bi bi-people"></i> Data Pelanggan</a>
+        <a class="nav-pill" href="grooming-order.html"><i class="bi bi-scissors"></i> Order Grooming</a>
+        <a class="nav-pill" href="laporan-harian.html"><i class="bi bi-file-earmark-text"></i> Laporan Harian</a>
+      </nav>
+
+      <div class="nav-section-title">Akun</div>
+      <div class="d-grid gap-1">
+        <a class="nav-pill" href="#"><i class="bi bi-sliders"></i> Pengaturan</a>
+        <a class="nav-pill" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </div>
+    </aside>
+
+
+    <!-- CONTENT -->
+    <section class="content">
+      <header class="topbar">
+        <div class="d-flex align-items-center justify-content-between gap-3">
+          <div>
+            <div class="fw-semibold">Riwayat Transaksi Grooming</div>
+          </div>
+
+          <div class="search position-relative flex-grow-1 d-none d-md-block">
+            <i class="bi bi-search"></i>
+            <input id="searchTop" class="form-control" placeholder="Cari kode grooming / pelanggan / hewan / kasir..." />
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-light border rounded-3" type="button" title="Notifikasi">
+              <i class="bi bi-bell"></i>
+            </button>
+
+            <div class="dropdown">
+              <button class="btn btn-light border rounded-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle me-1"></i> Kasir
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#">Profil</a></li>
+                <li><a class="dropdown-item" href="#">Pengaturan</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><a class="dropdown-item" href="#">Logout</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="page">
+
+        <!-- CARD: FILTER -->
+        <div class="soft-card p-3 mb-3">
+          <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+            <div>
+              <div class="fw-semibold">Daftar Riwayat Grooming</div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <div class="position-relative">
+                <i class="bi bi-search position-absolute" style="left:14px; top:50%; transform:translateY(-50%); color:#6c757d;"></i>
+                <input id="searchLocal" class="form-control" style="border-radius:12px; padding-left:40px; min-width:280px;" placeholder="Cari: GRM-..., Pelanggan, Hewan, Kasir..." />
+              </div>
+              <button id="btnReset" class="btn btn-outline-secondary rounded-3" type="button" title="Reset">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            </div>
+          </div>
+
+
+        </div>
+
+        <!-- TABLE: RIWAYAT GROOMING -->
+        <div class="soft-card p-3 mb-3">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div>
+              <div class="fw-semibold">Tabel Riwayat Transaksi Grooming</div>
+           
+            </div>
+
+            <span id="infoHasil" class="badge text-bg-light border">
+              <i class="bi bi-list-ul me-1"></i> Menampilkan semua
+            </span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table align-middle" id="tabelRiwayatGrooming">
+              <thead class="table-light">
+                <tr>
+                  <th>Kode Grooming</th>
+                  <th>Pelanggan</th>
+                  <th>Hewan</th>
+                  <th>Layanan</th>
+                  <th class="text-end">Total</th>
+                  <th>Metode</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody><!-- render via JS --></tbody>
+            </table>
+          </div>
+        </div>
+
+        <footer class="text-muted small mt-4">© 2026 Chicko Pet Shop</footer>
+      </main>
+    </section>
+  </div>
+
+  <!-- MODAL DETAIL GROOMING -->
+  <div class="modal fade" id="modalDetailGrooming" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content" style="border-radius: 14px;">
+        <div class="modal-header">
+          <div>
+            <div class="fw-semibold">Detail Transaksi Grooming</div>
+            <div class="text-muted small" id="detailSub">-</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="soft-card p-3 mb-3">
+            <div class="detail-block-title">Informasi</div>
+            <div class="kv">
+              <div class="k">Kode Grooming</div><div class="v mono" id="dKode">-</div>
+              <div class="k">Pelanggan</div><div class="v" id="dPelanggan">-</div>
+              <div class="k">Hewan</div><div class="v" id="dHewan">-</div>
+              <div class="k">Layanan</div><div class="v" id="dLayanan">-</div>
+              <div class="k">Kasir</div><div class="v" id="dKasir">-</div>
+              <div class="k">Status</div><div class="v" id="dStatus">-</div>
+              <div class="k">Tanggal</div><div class="v text-muted" id="dTanggal">-</div>
+            </div>
+          </div>
+
+          <div class="soft-card p-3 mb-3">
+            <div class="detail-block-title">Pembayaran</div>
+            <div class="kv">
+              <div class="k">Metode</div><div class="v" id="dMetode">-</div>
+              <div class="k">Total</div><div class="v fw-semibold" id="dTotal">-</div>
+              <div class="k">Bayar</div><div class="v" id="dBayar">-</div>
+              <div class="k">Kembalian</div><div class="v" id="dKembali">-</div>
+            </div>
+          </div>
+
+          <div class="soft-card p-3">
+            <div class="detail-block-title">Catatan</div>
+            <div class="text-muted" id="dCatatan">-</div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal" type="button">
+            Tutup
+          </button>
+          <button class="btn btn-primary rounded-3" type="button" id="btnPrintDemo">
+            <i class="bi bi-printer me-1"></i> Cetak (Demo)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS: Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ====== Active menu sidebar ======
+    (function setActiveSidebar() {
+      const links = document.querySelectorAll(".nav-pill[href]");
+      const current = (location.pathname.split("/").pop() || "riwayat_grooming.html").toLowerCase();
+      links.forEach((a) => {
+        const href = (a.getAttribute("href") || "").toLowerCase();
+        a.classList.toggle("active", href === current);
+      });
+    })();
+
+    // ====== FORMAT RUPIAH ======
+    const idr = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" });
+    function rupiah(n) { return idr.format(Number(n || 0)); }
+
+    // ====== BADGE STATUS (grooming) ======
+    function badgeStatus(s) {
+      const v = String(s || "").toLowerCase();
+      if (v === "selesai") return '<span class="badge text-bg-success">Selesai</span>';
+      if (v === "proses") return '<span class="badge text-bg-primary">Proses</span>';
+      return '<span class="badge text-bg-warning">Menunggu</span>';
+    }
+
+    // ====== DATA CONTOH RIWAYAT TRANSAKSI GROOMING ======
+    // status: Menunggu | Proses | Selesai
+    const groomingList = [
+      {
+        kode: "GRM-00031",
+        pelanggan: "Rina",
+        hewan: "Kucing - Mochi",
+        layanan: "Grooming Basic",
+        total: 60000,
+        metode: "Kas",
+        status: "Menunggu",
+        kasir: "Budi",
+        tanggal: "2026-01-06 10:15",
+        bayar: 0,
+        kembalian: 0,
+        catatan: "Alergi parfum kuat."
+      },
+      {
+        kode: "GRM-00032",
+        pelanggan: "Dodi",
+        hewan: "Anjing - Bruno",
+        layanan: "Grooming Premium",
+        total: 120000,
+        metode: "QRIS",
+        status: "Proses",
+        kasir: "Sari",
+        tanggal: "2026-01-06 11:00",
+        bayar: 120000,
+        kembalian: 0,
+        catatan: "Minta rapih area kaki."
+      },
+      {
+        kode: "GRM-00033",
+        pelanggan: "Salsa",
+        hewan: "Kucing - Luna",
+        layanan: "Cukur Bulu",
+        total: 45000,
+        metode: "Kartu",
+        status: "Selesai",
+        kasir: "Budi",
+        tanggal: "2026-01-06 12:05",
+        bayar: 45000,
+        kembalian: 0,
+        catatan: "-"
+      },
+      {
+        kode: "GRM-00034",
+        pelanggan: "Bagas",
+        hewan: "Anjing - Kenzo",
+        layanan: "Mandi Kutu + Obat",
+        total: 90000,
+        metode: "Kas",
+        status: "Selesai",
+        kasir: "Sari",
+        tanggal: "2026-01-06 13:40",
+        bayar: 100000,
+        kembalian: 10000,
+        catatan: "Tolong dicek kutu di leher."
+      },
+    ];
+
+    // ====== RENDER TABLE ======
+    function renderTable(data) {
+      const tbody = document.querySelector("#tabelRiwayatGrooming tbody");
+      tbody.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-muted">Tidak ada transaksi grooming.</td>
+          </tr>
+        `;
+      } else {
+        data.forEach((t) => {
+          const tr = document.createElement("tr");
+          tr.className = "row-click";
+          tr.setAttribute("data-kode", t.kode);
+
+          tr.innerHTML = `
+            <td class="fw-semibold mono">${t.kode}</td>
+            <td>${t.pelanggan}</td>
+            <td class="text-muted">${t.hewan}</td>
+            <td>${t.layanan}</td>
+            <td class="text-end fw-semibold">${rupiah(t.total)}</td>
+            <td>${t.metode}</td>
+            <td>${badgeStatus(t.status)}</td>
+          `;
+
+          tr.addEventListener("click", () => openDetail(t.kode));
+          tbody.appendChild(tr);
+        });
+      }
+
+      const info = document.getElementById("infoHasil");
+      const q = (document.getElementById("searchLocal").value || "").trim();
+      info.innerHTML = q
+        ? `<i class="bi bi-funnel me-1"></i> Hasil: ${data.length} transaksi`
+        : `<i class="bi bi-list-ul me-1"></i> Menampilkan semua (${data.length})`;
+    }
+
+    // ====== OPEN DETAIL (MODAL) ======
+    function openDetail(kode) {
+      const t = groomingList.find(x => x.kode === kode);
+      if (!t) return;
+
+      document.getElementById("detailSub").textContent =
+        `Klik "Tutup" untuk kembali | ${new Date().toLocaleString("id-ID")}`;
+
+      document.getElementById("dKode").textContent = t.kode;
+      document.getElementById("dPelanggan").textContent = t.pelanggan;
+      document.getElementById("dHewan").textContent = t.hewan;
+      document.getElementById("dLayanan").textContent = t.layanan;
+      document.getElementById("dKasir").textContent = t.kasir;
+      document.getElementById("dStatus").innerHTML = badgeStatus(t.status);
+      document.getElementById("dTanggal").textContent = t.tanggal;
+
+      document.getElementById("dMetode").textContent = t.metode;
+      document.getElementById("dTotal").textContent = rupiah(t.total);
+
+      const bayarTxt = (t.bayar && t.bayar > 0) ? rupiah(t.bayar) : "-";
+      const kembaliTxt = (t.bayar && t.bayar > 0) ? rupiah(t.kembalian) : "-";
+      document.getElementById("dBayar").textContent = bayarTxt;
+      document.getElementById("dKembali").textContent = kembaliTxt;
+
+      document.getElementById("dCatatan").textContent = (t.catatan || "-");
+
+      bootstrap.Modal.getOrCreateInstance(document.getElementById("modalDetailGrooming")).show();
+    }
+
+    // ====== FILTER SEARCH ======
+    function applyFilter(keyword) {
+      const q = (keyword || "").trim().toLowerCase();
+      const filtered = groomingList.filter((t) => {
+        const blob = `${t.kode} ${t.pelanggan} ${t.hewan} ${t.layanan} ${t.metode} ${t.status} ${t.kasir}`.toLowerCase();
+        return q === "" ? true : blob.includes(q);
+      });
+      renderTable(filtered);
+    }
+
+    document.getElementById("searchLocal").addEventListener("input", function () {
+      applyFilter(this.value);
+      document.getElementById("searchTop").value = this.value;
+    });
+
+    document.getElementById("searchTop").addEventListener("input", function () {
+      applyFilter(this.value);
+      document.getElementById("searchLocal").value = this.value;
+    });
+
+    document.getElementById("btnReset").addEventListener("click", function () {
+      document.getElementById("searchLocal").value = "";
+      document.getElementById("searchTop").value = "";
+      applyFilter("");
+      document.getElementById("searchLocal").focus();
+    });
+
+    // ====== PRINT DEMO ======
+    document.getElementById("btnPrintDemo").addEventListener("click", () => {
+      alert("Demo: Cetak struk / invoice grooming.\n(Implementasi: window.print() / generate PDF / kirim ke printer)");
+    });
+
+    // init
+    renderTable(groomingList);
+  </script>
+</body>
+</html>

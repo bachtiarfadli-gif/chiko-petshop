@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Order Grooming - Kasir Pet Shop</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <!-- CSS DASHBOARD (TIDAK DIUBAH) -->
+  <style>
+    :root {
+      --app-bg: #f6f7fb;
+      --card-radius: 16px;
+      --sidebar-w: 280px;
+    }
+    body { background: var(--app-bg); }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: #fff;
+      border-right: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 18px 14px;
+      overflow-y: auto;
+      overscroll-behavior: contain; /* biar scroll gak “narik” halaman */
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .brand .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: #f1f5ff;
+      color: #2b5cff;
+      font-weight: 700;
+    }
+
+    .nav-pill {
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #3a3f4b;
+      text-decoration: none;
+    }
+
+    .nav-pill:hover { background: rgba(43, 92, 255, 0.08); }
+
+    .nav-pill.active {
+      background: rgba(43, 92, 255, 0.12);
+      color: #1f4bff;
+      font-weight: 600;
+    }
+
+    .nav-section-title {
+      font-size: 0.78rem;
+      color: #6c757d;
+      letter-spacing: 0.08em;
+      margin: 18px 10px 8px;
+      text-transform: uppercase;
+    }
+
+    .content {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-width: 0;
+    }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 14px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .search { max-width: 520px; }
+
+    .search .form-control {
+      border-radius: 12px;
+      padding-left: 40px;
+    }
+
+    .search .bi-search {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+    }
+
+    .page { padding: 18px; }
+
+    .soft-card {
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: var(--card-radius);
+      box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+      background: #fff;
+    }
+
+    .stat {
+      border-radius: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: linear-gradient(180deg, #fff, #fbfcff);
+    }
+
+    .module-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: #f3f6ff;
+      color: #2b5cff;
+      font-size: 1.25rem;
+    }
+
+    @media (max-width: 992px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: relative; height: auto; }
+    }
+  </style>
+
+  <!-- STYLE TAMBAHAN KHUSUS ORDER GROOMING (BOLEH TAMBAH, TIDAK MENGUBAH CSS DASHBOARD) -->
+  <style>
+    .pos-shell { overflow: hidden; }
+    .pos-left { border-right: 1px solid rgba(0,0,0,0.10); min-height: 72vh; background: #fff; }
+    .pos-right { min-height: 72vh; background: #fff; }
+
+    /* LEFT LIST */
+    .order-table { width: 100%; min-height: 44vh; }
+    .order-row {
+      display: grid;
+      grid-template-columns: 44px 1fr 140px 44px;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .order-row:last-child { border-bottom: 0; }
+    .order-row.active { background: rgba(43,92,255,0.06); }
+
+    .qty-badge {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(43,92,255,0.10);
+      color: #1f4bff;
+      font-weight: 800;
+    }
+    .order-empty { min-height: 44vh; background: #fff; }
+
+    .order-name { font-weight: 700; }
+    .order-sub { color: #6c757d; font-size: 0.85rem; }
+    .order-price { text-align: right; font-weight: 700; }
+    .btn-del {
+      width: 36px; height: 36px;
+      display: grid; place-items: center;
+      border-radius: 10px;
+    }
+
+    .total-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 12px;
+      border-top: 1px solid rgba(0,0,0,0.10);
+      font-weight: 800;
+      background: #fff;
+    }
+
+    .tabs-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-top: 1px solid rgba(0,0,0,0.10);
+      background: #fff;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* KEYPAD (POS) */
+    .keypad {
+      padding: 12px;
+      border-top: 1px solid rgba(0,0,0,0.10);
+      background: #fff;
+    }
+    .key-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .key-btn {
+      padding: 18px 10px;
+      border-radius: 0;
+      border: 1px solid rgba(0,0,0,0.12);
+      background: #f8f9fa;
+      font-weight: 800;
+    }
+    .key-btn:active { transform: scale(0.99); }
+    .key-btn.key-accent { background: rgba(43, 92, 255, 0.10); }
+    .key-btn.key-warn { background: rgba(255,193,7,0.25); }
+    .key-btn.key-danger { background: rgba(220,53,69,0.25); }
+
+    .buffer-strip {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 1px dashed rgba(0,0,0,0.18);
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #6c757d;
+      font-weight: 700;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .buffer-strip .val { color: #111827; font-weight: 900; }
+
+    .pay-btn {
+      width: 100%;
+      padding: 18px 14px;
+      border: 0;
+      border-radius: 10px;
+      background: #6b4b63;
+      color: #fff;
+      font-weight: 900;
+    }
+
+    /* RIGHT PRODUCTS (CARD BUTTONS) */
+    .produk-wrap { padding: 12px; }
+    .produk-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 10px;
+      align-content: start;
+    }
+    @media (max-width: 1200px) { .produk-grid { grid-template-columns: repeat(4, minmax(120px, 1fr)); } }
+    @media (max-width: 768px) { .produk-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); } }
+
+    .produk-btn {
+      position: relative;
+      min-height: 66px;
+      white-space: normal;
+      line-height: 1.15;
+      font-weight: 800;
+    }
+    .produk-qty-mini {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      background: #000;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 12px;
+      padding: 2px 7px;
+      font-weight: 900;
+      display: none;
+    }
+    .produk-btn.has-qty .produk-qty-mini { display: inline-block; }
+
+    /* VIEW SWITCH */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* PAYMENT VIEW */
+    .pay-shell { overflow: hidden; }
+    .pay-left { border-right: 1px solid rgba(0,0,0,0.10); min-height: 72vh; background: #fff; }
+    .pay-right { min-height: 72vh; background: #fff; }
+
+    .method-list {
+      padding: 10px;
+      max-height: 220px;
+      overflow: auto;
+    }
+    .method-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 12px;
+      border: 1px solid rgba(0,0,0,0.10);
+      border-radius: 12px;
+      background: #f8f9fa;
+      font-weight: 800;
+      margin-bottom: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .method-item.active {
+      background: rgba(43,92,255,0.10);
+      border-color: rgba(43,92,255,0.25);
+    }
+
+    .big-total {
+      font-size: clamp(42px, 6vw, 92px);
+      font-weight: 900;
+      text-align: center;
+      padding: 28px 16px 10px;
+      color: #111827;
+    }
+    .big-total .rp { font-weight: 800; color: #6b7280; margin-right: 8px; }
+
+    .pay-summary {
+      padding: 10px 18px 18px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .pay-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 14px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 12px;
+      background: rgba(33, 181, 201, 0.08);
+    }
+    .pay-line .name { font-weight: 900; }
+    .pay-line .amt { font-weight: 900; }
+    .pay-line .x {
+      color: #dc3545;
+      font-weight: 900;
+      cursor: pointer;
+      padding: 0 8px;
+      user-select: none;
+    }
+    .kembalian {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 14px 0;
+      border-top: 1px solid rgba(0,0,0,0.10);
+      margin-top: 14px;
+    }
+    .kembalian .lbl { color: #dc3545; font-weight: 900; font-size: 20px; }
+    .kembalian .val { color: #dc3545; font-weight: 900; font-size: 22px; }
+
+    .pay-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 12px;
+      border-top: 1px solid rgba(0,0,0,0.10);
+      background: #fff;
+    }
+    .btn-wide {
+      width: 100%;
+      padding: 16px 12px;
+      border-radius: 10px;
+      font-weight: 900;
+    }
+    .btn-validate {
+      background: #6b4b63;
+      border: 0;
+      color: #fff;
+    }
+
+    /* SUCCESS VIEW */
+    .success-wrap { padding: 22px; }
+    .success-box {
+      border: 1px solid rgba(25,135,84,0.35);
+      background: rgba(25,135,84,0.15);
+      border-radius: 12px;
+      padding: 18px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      text-align: center;
+      flex-wrap: wrap;
+      font-weight: 900;
+    }
+    .success-box .icon {
+      width: 36px; height: 36px;
+      border-radius: 999px;
+      display: grid; place-items: center;
+      background: #198754;
+      color: #fff;
+      font-weight: 900;
+    }
+    .btn-neworder {
+      margin-top: 14px;
+      width: 100%;
+      padding: 16px 12px;
+      border-radius: 10px;
+      font-weight: 900;
+      background: #6b4b63;
+      border: 0;
+      color: #fff;
+    }
+    .btn-print {
+      margin-top: 12px;
+      width: 100%;
+      padding: 14px 12px;
+      border-radius: 10px;
+      font-weight: 900;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- SIDEBAR (TETAP, TIDAK DIHAPUS) -->
+    <aside class="sidebar">
+      <div class="brand mb-2">
+        <div class="logo">PS</div>
+        <div class="w-100">
+          <div class="fw-semibold">Pet Shop Kasir</div>
+          <div class="text-muted small">Dashboard</div>
+        </div>
+      </div>
+
+        <div class="nav-section-title">Menu Kasir</div>
+      <nav class="d-grid gap-1">
+        <a class="nav-pill" href="dashboard-kasir.html"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a class="nav-pill" href="transaksi.html"><i class="bi bi-cart-check"></i> Transaksi (Kasir)</a>
+        <a class="nav-pill" href="produk.html"><i class="bi bi-box-seam"></i> Produk</a>
+        <a class="nav-pill" href="riwayat-transaksi.html"><i class="bi bi-clock-history"></i> Riwayat Transaksi</a>
+        <a class="nav-pill" href="pelanggan.html"><i class="bi bi-people"></i> Data Pelanggan</a>
+        <a class="nav-pill" href="grooming-order.html"><i class="bi bi-scissors"></i> Order Grooming</a>
+        <a class="nav-pill" href="laporan-harian.html"><i class="bi bi-file-earmark-text"></i> Laporan Harian</a>
+      </nav>
+
+      <div class="nav-section-title">Akun</div>
+      <div class="d-grid gap-1">
+        <a class="nav-pill" href="#"><i class="bi bi-sliders"></i> Pengaturan</a>
+        <a class="nav-pill" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <section class="content">
+      <header class="topbar">
+        <div class="d-flex align-items-center justify-content-between gap-3">
+          <div>
+            <div class="fw-semibold">Order Grooming</div>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <div class="position-relative" style="min-width: 320px; max-width: 420px; width: 40vw;">
+              <i class="bi bi-search position-absolute" style="left:14px; top:50%; transform:translateY(-50%); color:#6c757d;"></i>
+              <input id="searchProduk" class="form-control" style="border-radius:12px; padding-left:40px;" placeholder="Cari layanan grooming..." />
+            </div>
+
+            <span class="badge text-bg-light border" title="Scan" style="border-radius:12px; padding:10px 12px;">
+              <i class="bi bi-upc-scan"></i>
+            </span>
+
+            <span class="badge text-bg-success" title="Kasir" style="border-radius:12px; padding:10px 12px;">
+              B
+            </span>
+
+            <button class="btn btn-light border rounded-3" type="button" title="Menu">
+              <i class="bi bi-list"></i>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="page">
+
+        <!-- VIEW 1: POS -->
+        <div id="viewPOS" class="view active">
+          <div class="soft-card pos-shell">
+            <div class="row g-0">
+
+              <!-- LEFT: ORDER + TOTAL + TAB + KEYPAD + PAY -->
+              <div class="col-12 col-lg-5 pos-left">
+                <div id="orderList" class="order-table">
+                  <!-- render via JS -->
+                </div>
+
+                <div class="buffer-strip mt-3">
+                  <div>Layanan: <span class="val" id="activeName">-</span></div>
+                  <div>Jumlah: <span class="val" id="bufferText">-</span></div>
+                </div>
+
+                <div class="total-bar">
+                  <div style="font-size: 1.1rem;">Total</div>
+                  <div style="font-size: 1.1rem;" id="orderTotal">Rp 0,00</div>
+                </div>
+
+                <div class="tabs-bar">
+                  <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-light border rounded-3 fw-semibold" type="button">Pelanggan</button>
+                    <button class="btn btn-light border rounded-3 fw-semibold text-muted" type="button">Catatan</button>
+                  </div>
+
+                  <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button id="btnBatalkan" class="btn btn-outline-danger rounded-3 fw-semibold" type="button" title="Batalkan Order">
+                      <i class="bi bi-x-circle me-1"></i> Batalkan
+                    </button>
+                    <button class="btn btn-light border rounded-3" type="button" title="Opsi">
+                      <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="keypad">
+                  <div class="key-grid">
+                    <button class="key-btn" data-key="1">1</button>
+                    <button class="key-btn" data-key="2">2</button>
+                    <button class="key-btn" data-key="3">3</button>
+                    <button class="key-btn key-accent" data-fn="applyQty">Jml</button>
+
+                    <button class="key-btn" data-key="4">4</button>
+                    <button class="key-btn" data-key="5">5</button>
+                    <button class="key-btn" data-key="6">6</button>
+                    <button class="key-btn" data-fn="noop">%</button>
+
+                    <button class="key-btn" data-key="7">7</button>
+                    <button class="key-btn" data-key="8">8</button>
+                    <button class="key-btn" data-key="9">9</button>
+                    <button class="key-btn" data-fn="noop2">Harga</button>
+
+                    <button class="key-btn key-warn" data-fn="plusminus">+/-</button>
+                    <button class="key-btn" data-key="0">0</button>
+                    <button class="key-btn key-danger" data-key=",">,</button>
+                    <button class="key-btn key-danger" data-fn="back"><i class="bi bi-backspace"></i></button>
+                  </div>
+
+                  <div class="mt-3">
+                    <button class="pay-btn" id="btnBayar" type="button">Pembayaran</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RIGHT: LAYANAN GRID -->
+              <div class="col-12 col-lg-7 pos-right">
+                <div class="produk-wrap">
+                  <div class="produk-grid" id="gridProduk">
+                    <!-- contoh layanan grooming -->
+                    <button class="btn btn-light border rounded-3 produk-btn" type="button"
+                            data-kode="GR001" data-nama="Grooming Basic (Kucing)" data-harga="45000">
+                      Grooming Basic<br>(Kucing)
+                      <span class="produk-qty-mini">0</span>
+                    </button>
+
+                    <button class="btn btn-light border rounded-3 produk-btn" type="button"
+                            data-kode="GR002" data-nama="Grooming Basic (Anjing)" data-harga="60000">
+                      Grooming Basic<br>(Anjing)
+                      <span class="produk-qty-mini">0</span>
+                    </button>
+
+                    <button class="btn btn-light border rounded-3 produk-btn" type="button"
+                            data-kode="GR003" data-nama="Grooming Premium" data-harga="90000">
+                      Grooming<br>Premium
+                      <span class="produk-qty-mini">0</span>
+                    </button>
+
+                    <button class="btn btn-light border rounded-3 produk-btn" type="button"
+                            data-kode="GR004" data-nama="Mandi Kutu + Obat" data-harga="75000">
+                      Mandi Kutu<br>+ Obat
+                      <span class="produk-qty-mini">0</span>
+                    </button>
+
+                    <button class="btn btn-light border rounded-3 produk-btn" type="button"
+                            data-kode="GR005" data-nama="Potong Kuku" data-harga="15000">
+                      Potong<br>Kuku
+                      <span class="produk-qty-mini">0</span>
+                    </button>
+
+                    <button class="btn btn-light border rounded-3 produk-btn" type="button"
+                            data-kode="GR006" data-nama="Bersih Telinga" data-harga="12000">
+                      Bersih<br>Telinga
+                      <span class="produk-qty-mini">0</span>
+                    </button>
+
+                    <button class="btn btn-light border rounded-3 produk-btn" type="button"
+                            data-kode="GR007" data-nama="Trimming" data-harga="40000">
+                      Trimming
+                      <span class="produk-qty-mini">0</span>
+                    </button>
+
+                    <button class="btn btn-light border rounded-3 produk-btn" type="button"
+                            data-kode="GR008" data-nama="Spa / Aroma Therapy" data-harga="50000">
+                      Spa / Aroma<br>Therapy
+                      <span class="produk-qty-mini">0</span>
+                    </button>
+
+                    <button class="btn btn-light border rounded-3 produk-btn" type="button"
+                            data-kode="GR009" data-nama="Cukur Bulu" data-harga="35000">
+                      Cukur<br>Bulu
+                      <span class="produk-qty-mini">0</span>
+                    </button>
+
+                    <button class="btn btn-light border rounded-3 produk-btn" type="button"
+                            data-kode="GR010" data-nama="Paket Lengkap (All in)" data-harga="120000">
+                      Paket Lengkap<br>(All in)
+                      <span class="produk-qty-mini">0</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 2: PAYMENT -->
+        <div id="viewPAY" class="view">
+          <div class="soft-card pay-shell">
+            <div class="row g-0">
+              <!-- LEFT: METODE + INPUT STATUS + KEYPAD + ACTIONS -->
+              <div class="col-12 col-lg-5 pay-left">
+                <div class="p-3">
+                  <div class="fw-semibold">Metode Pembayaran</div>
+                </div>
+
+                <div class="method-list">
+                  <div class="method-item active" data-method="cash">
+                    <div class="d-flex align-items-center gap-2">
+                      <i class="bi bi-cash-coin"></i> Kas
+                    </div>
+                    <i class="bi bi-check2"></i>
+                  </div>
+                  <div class="method-item" data-method="card">
+                    <div class="d-flex align-items-center gap-2">
+                      <i class="bi bi-credit-card-2-front"></i> Kartu
+                    </div>
+                    <span class="text-muted small">EDC</span>
+                  </div>
+                  <div class="method-item" data-method="qris">
+                    <div class="d-flex align-items-center gap-2">
+                      <i class="bi bi-qr-code-scan"></i> QRIS
+                    </div>
+                    <span class="text-muted small">QRIS</span>
+                  </div>
+                </div>
+
+                <!-- TAMBAHAN: PILIHAN STATUS ORDER SAAT INPUT -->
+                <div class="px-3 pb-2">
+                  <div class="fw-semibold mb-1">Status Order</div>
+                  <select id="orderStatus" class="form-select" style="border-radius:12px;">
+                    <option value="Menunggu">Menunggu</option>
+                    <option value="Diproses">Diproses</option>
+                    <option value="Selesai">Selesai</option>
+                    <option value="Batal">Batal</option>
+                  </select>
+                </div>
+
+                <div class="keypad">
+                  <div class="buffer-strip mt-3">
+                    <div>Nominal bayar</div>
+                    <div class="val" id="payBufferText">Rp 0,00</div>
+                  </div>
+                </div>
+
+                <div class="key-grid">
+                  <button class="key-btn" data-paykey="1">1</button>
+                  <button class="key-btn" data-paykey="2">2</button>
+                  <button class="key-btn" data-paykey="3">3</button>
+                  <button class="key-btn key-accent" data-payfn="plus10">+10</button>
+
+                  <button class="key-btn" data-paykey="4">4</button>
+                  <button class="key-btn" data-paykey="5">5</button>
+                  <button class="key-btn" data-paykey="6">6</button>
+                  <button class="key-btn key-accent" data-payfn="plus20">+20</button>
+
+                  <button class="key-btn" data-paykey="7">7</button>
+                  <button class="key-btn" data-paykey="8">8</button>
+                  <button class="key-btn" data-paykey="9">9</button>
+                  <button class="key-btn key-accent" data-payfn="plus50">+50</button>
+
+                  <button class="key-btn key-warn" data-payfn="plusminus">+/-</button>
+                  <button class="key-btn" data-paykey="0">0</button>
+                  <button class="key-btn key-danger" data-paykey=",">,</button>
+                  <button class="key-btn key-danger" data-payfn="back"><i class="bi bi-backspace"></i></button>
+                </div>
+
+                <div class="pay-actions">
+                  <button class="btn btn-light border btn-wide" id="btnKembali" type="button">Kembali</button>
+                  <button class="btn btn-validate btn-wide" id="btnValidasi" type="button">Validasi</button>
+                </div>
+              </div>
+
+              <!-- RIGHT: TOTAL BESAR + RINCIAN + KEMBALIAN -->
+              <div class="col-12 col-lg-7 pay-right">
+                <div class="big-total">
+                  <span class="rp">Rp</span><span id="payTotalBig">0,00</span>
+                </div>
+
+                <div class="pay-summary">
+                  <div class="pay-line">
+                    <div class="name" id="payMethodName">Kas</div>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="amt" id="payGiven">Rp 0,00</div>
+                      <div class="x" id="payClear" title="Hapus pembayaran">×</div>
+                    </div>
+                  </div>
+
+                  <div class="kembalian">
+                    <div class="lbl">Kembalian</div>
+                    <div class="val"><span class="text-muted" style="font-weight:900;">Rp </span><span id="payChange">0,00</span></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 3: SUCCESS -->
+        <div id="viewSUCCESS" class="view">
+          <div class="soft-card success-wrap">
+            <div class="success-box">
+              <div class="icon"><i class="bi bi-check-lg"></i></div>
+              <div>
+                <div style="font-size: 18px;">Order Grooming Berhasil</div>
+                <div style="font-size: 18px;">
+                  <span id="successTotal">Rp 0,00</span>
+                  <span class="badge text-bg-light border ms-2" id="successStatus">Status: -</span>
+                  <button id="btnEditPembayaran" class="btn btn-success btn-sm ms-2 fw-semibold" type="button">Edit Pembayaran</button>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-light border btn-print" type="button">
+              <i class="bi bi-printer me-1"></i> Cetak Resi Grooming
+            </button>
+
+            <button class="btn-neworder" id="btnPesananBaru" type="button">
+              Buat Pesanan Baru
+            </button>
+          </div>
+        </div>
+
+        <footer class="text-muted small mt-4">© 2026 Chicko Pet Shop</footer>
+      </main>
+    </section>
+  </div>
+
+  <!-- JS: Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ====== Active menu sidebar berdasarkan nama file halaman ======
+    (function setActiveSidebar() {
+      const links = document.querySelectorAll(".nav-pill[href]");
+      const current = (location.pathname.split("/").pop() || "grooming-order.html").toLowerCase();
+      links.forEach((a) => {
+        const href = (a.getAttribute("href") || "").toLowerCase();
+        a.classList.toggle("active", href === current);
+      });
+    })();
+
+    // ====== Helpers: Rupiah format "Rp 120.000,00" ======
+    const idr = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" });
+    function rupiah(n) { return idr.format(Number(n || 0)); }
+    function rpNoSymbol(n) { return rupiah(n).replace("Rp", "").trim(); }
+
+    // ====== View switcher ======
+    function showView(name) {
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      if (name === "pos") document.getElementById("viewPOS").classList.add("active");
+      if (name === "pay") document.getElementById("viewPAY").classList.add("active");
+      if (name === "success") document.getElementById("viewSUCCESS").classList.add("active");
+    }
+
+    // ====== Data layanan (dibaca dari tombol .produk-btn) ======
+    function getProdukButtons() {
+      return Array.from(document.querySelectorAll(".produk-btn"));
+    }
+
+    // ====== ORDER STATE ======
+    const order = new Map(); // { kode, nama, harga, qty }
+    let activeItemKode = null;
+    let qtyBuffer = "";
+
+    function calcTotal() {
+      let total = 0;
+      order.forEach(it => total += it.qty * it.harga);
+      return total;
+    }
+
+    function setActiveLabel() {
+      const el = document.getElementById("activeName");
+      if (!activeItemKode || !order.has(activeItemKode)) {
+        el.textContent = "-";
+        return;
+      }
+      el.textContent = order.get(activeItemKode).nama;
+    }
+
+    function highlightActiveRow() {
+      document.querySelectorAll(".order-row").forEach(r => {
+        r.classList.toggle("active", r.dataset.kode === activeItemKode);
+      });
+    }
+
+    function syncProdukBadge() {
+      getProdukButtons().forEach(btn => {
+        const kode = btn.dataset.kode;
+        const it = order.get(kode);
+        const badge = btn.querySelector(".produk-qty-mini");
+        if (!badge) return;
+
+        if (it && it.qty > 0) {
+          btn.classList.add("has-qty");
+          badge.textContent = it.qty;
+        } else {
+          btn.classList.remove("has-qty");
+          badge.textContent = "0";
+        }
+      });
+    }
+
+    function renderOrder() {
+      const container = document.getElementById("orderList");
+      container.innerHTML = "";
+
+      if (order.size === 0) {
+        container.innerHTML = `<div class="order-empty"></div>`;
+        document.getElementById("orderTotal").textContent = rupiah(0);
+        activeItemKode = null;
+        qtyBuffer = "";
+        document.getElementById("bufferText").textContent = "-";
+        setActiveLabel();
+        syncProdukBadge();
+        return;
+      }
+
+      order.forEach((it) => {
+        const row = document.createElement("div");
+        row.className = "order-row";
+        row.dataset.kode = it.kode;
+
+        row.innerHTML = `
+          <div class="qty-badge">${it.qty}</div>
+          <div style="min-width:0;">
+            <div class="order-name text-truncate">${it.nama}</div>
+            <div class="order-sub">${rupiah(it.harga)} / layanan</div>
+          </div>
+          <div class="order-price">${rupiah(it.harga * it.qty)}</div>
+          <button class="btn btn-light border btn-del" type="button" title="Hapus item">
+            <i class="bi bi-trash3"></i>
+          </button>
+        `;
+
+        row.addEventListener("click", (e) => {
+          if (e.target.closest(".btn-del")) return;
+          activeItemKode = it.kode;
+          qtyBuffer = "";
+          document.getElementById("bufferText").textContent = "-";
+          setActiveLabel();
+          highlightActiveRow();
+        });
+
+        row.querySelector(".btn-del").addEventListener("click", (e) => {
+          e.stopPropagation();
+          order.delete(it.kode);
+          if (activeItemKode === it.kode) activeItemKode = null;
+          renderOrder();
+          highlightActiveRow();
+          setActiveLabel();
+        });
+
+        container.appendChild(row);
+      });
+
+      document.getElementById("orderTotal").textContent = rupiah(calcTotal());
+      syncProdukBadge();
+      highlightActiveRow();
+      setActiveLabel();
+    }
+
+    // ====== Klik layanan kanan: tambah ke order (qty +1) ======
+    getProdukButtons().forEach(btn => {
+      btn.addEventListener("click", () => {
+        const kode = btn.dataset.kode;
+        const nama = btn.dataset.nama || btn.innerText.trim();
+        const harga = Number(btn.dataset.harga || 0);
+
+        if (!order.has(kode)) order.set(kode, { kode, nama, harga, qty: 1 });
+        else {
+          const it = order.get(kode);
+          it.qty += 1;
+          order.set(kode, it);
+        }
+
+        activeItemKode = kode;
+        qtyBuffer = "";
+        document.getElementById("bufferText").textContent = "-";
+        renderOrder();
+      });
+    });
+
+    // ====== Search layanan kanan ======
+    document.getElementById("searchProduk").addEventListener("input", function () {
+      const q = (this.value || "").trim().toLowerCase();
+      getProdukButtons().forEach(btn => {
+        const nama = (btn.dataset.nama || btn.innerText).toLowerCase();
+        btn.style.display = nama.includes(q) ? "" : "none";
+      });
+    });
+
+    // ====== KEYPAD POS: angka -> buffer, Jml -> apply qty ke item aktif ======
+    function updateBufferUI() {
+      document.getElementById("bufferText").textContent = qtyBuffer ? qtyBuffer : "-";
+    }
+
+    document.querySelectorAll("[data-key]").forEach(b => {
+      b.addEventListener("click", () => {
+        if (!activeItemKode || !order.has(activeItemKode)) return;
+        qtyBuffer += b.getAttribute("data-key");
+        updateBufferUI();
+      });
+    });
+
+    document.querySelectorAll("[data-fn]").forEach(b => {
+      b.addEventListener("click", () => {
+        const fn = b.getAttribute("data-fn");
+
+        if (fn === "back") {
+          if (!activeItemKode || !order.has(activeItemKode)) return;
+          qtyBuffer = qtyBuffer.slice(0, -1);
+          updateBufferUI();
+          return;
+        }
+
+        if (fn === "plusminus") {
+          if (!activeItemKode || !order.has(activeItemKode)) return;
+          if (qtyBuffer.startsWith("-")) qtyBuffer = qtyBuffer.slice(1);
+          else qtyBuffer = "-" + qtyBuffer;
+          updateBufferUI();
+          return;
+        }
+
+        if (fn === "applyQty") {
+          if (!activeItemKode || !order.has(activeItemKode)) return;
+          const raw = (qtyBuffer || "").replace(",", ".").trim();
+          if (!raw) return;
+
+          const num = Number(raw);
+          const q = Math.max(1, Math.floor(Math.abs(num)));
+          const it = order.get(activeItemKode);
+          it.qty = q;
+          order.set(activeItemKode, it);
+
+          qtyBuffer = "";
+          updateBufferUI();
+          renderOrder();
+          return;
+        }
+      });
+    });
+
+    // ====== Batalkan order (hapus semua) ======
+    document.getElementById("btnBatalkan").addEventListener("click", () => {
+      if (order.size === 0) return;
+      if (!confirm("Batalkan order grooming dan hapus semua item?")) return;
+      order.clear();
+      activeItemKode = null;
+      qtyBuffer = "";
+      updateBufferUI();
+      renderOrder();
+    });
+
+    // ====== PAYMENT FLOW ======
+    let payMethod = "cash"; // cash | card | qris
+    let payBuffer = "";
+    let payGivenAmount = 0;
+
+    function parsePayBufferToNumber(buf) {
+      const clean = (buf || "").replace(",", ".").trim();
+      if (!clean) return 0;
+      const n = Number(clean);
+      if (Number.isNaN(n)) return 0;
+      return Math.max(0, Math.floor(n));
+    }
+
+    function setPayMethod(method) {
+      payMethod = method;
+      document.querySelectorAll(".method-item").forEach(x => x.classList.toggle("active", x.dataset.method === method));
+
+      const total = calcTotal();
+      if (method === "cash") {
+        payBuffer = "";
+        payGivenAmount = 0;
+      } else {
+        payBuffer = "";
+        payGivenAmount = total;
+      }
+      updatePaymentUI();
+    }
+
+    function updatePaymentUI() {
+      const total = calcTotal();
+      document.getElementById("payTotalBig").textContent = rpNoSymbol(total);
+
+      const methodName = payMethod === "cash" ? "Kas" : (payMethod === "card" ? "Kartu" : "QRIS");
+      document.getElementById("payMethodName").textContent = methodName;
+
+      const bufferNum = parsePayBufferToNumber(payBuffer);
+      const shownGiven = (payMethod === "cash") ? bufferNum : payGivenAmount;
+
+      document.getElementById("payBufferText").textContent = rupiah(shownGiven);
+      document.getElementById("payGiven").textContent = rupiah(shownGiven);
+
+      const change = shownGiven - total;
+      document.getElementById("payChange").textContent = rpNoSymbol(change);
+
+      const btnVal = document.getElementById("btnValidasi");
+      if (payMethod === "cash") btnVal.disabled = (shownGiven < total);
+      else btnVal.disabled = (total <= 0);
+
+      const keypadBtns = document.querySelectorAll("[data-paykey], [data-payfn]");
+      keypadBtns.forEach(b => b.disabled = (payMethod !== "cash"));
+    }
+
+    // payment keypad
+    document.querySelectorAll("[data-paykey]").forEach(b => {
+      b.addEventListener("click", () => {
+        if (payMethod !== "cash") return;
+        payBuffer += b.getAttribute("data-paykey");
+        payGivenAmount = parsePayBufferToNumber(payBuffer);
+        updatePaymentUI();
+      });
+    });
+
+    document.querySelectorAll("[data-payfn]").forEach(b => {
+      b.addEventListener("click", () => {
+        if (payMethod !== "cash") return;
+
+        const fn = b.getAttribute("data-payfn");
+        if (fn === "back") {
+          payBuffer = payBuffer.slice(0, -1);
+          payGivenAmount = parsePayBufferToNumber(payBuffer);
+          updatePaymentUI();
+          return;
+        }
+
+        if (fn === "plusminus") {
+          if (payBuffer.startsWith("-")) payBuffer = payBuffer.slice(1);
+          else payBuffer = "-" + payBuffer;
+          payGivenAmount = parsePayBufferToNumber(payBuffer);
+          updatePaymentUI();
+          return;
+        }
+
+        const curr = parsePayBufferToNumber(payBuffer);
+        if (fn === "plus10") payGivenAmount = curr + 10000;
+        if (fn === "plus20") payGivenAmount = curr + 20000;
+        if (fn === "plus50") payGivenAmount = curr + 50000;
+
+        payBuffer = String(payGivenAmount);
+        updatePaymentUI();
+      });
+    });
+
+    document.querySelectorAll(".method-item").forEach(it => {
+      it.addEventListener("click", () => setPayMethod(it.dataset.method));
+    });
+
+    // tombol Pembayaran
+    document.getElementById("btnBayar").addEventListener("click", () => {
+      if (order.size === 0) return;
+
+      setPayMethod("cash");
+      payBuffer = String(calcTotal());
+      payGivenAmount = parsePayBufferToNumber(payBuffer);
+
+      showView("pay");
+      updatePaymentUI();
+    });
+
+    document.getElementById("payClear").addEventListener("click", () => {
+      if (payMethod === "cash") {
+        payBuffer = "";
+        payGivenAmount = 0;
+      } else {
+        payGivenAmount = calcTotal();
+      }
+      updatePaymentUI();
+    });
+
+    document.getElementById("btnKembali").addEventListener("click", () => {
+      showView("pos");
+    });
+
+    // Validasi: simpan status dari dropdown, lalu sukses
+    document.getElementById("btnValidasi").addEventListener("click", () => {
+      const total = calcTotal();
+      if (total <= 0) return;
+
+      if (payMethod === "cash") {
+        const given = parsePayBufferToNumber(payBuffer);
+        if (given < total) return;
+      }
+
+      const status = document.getElementById("orderStatus").value || "-";
+      document.getElementById("successTotal").textContent = rupiah(total);
+      document.getElementById("successStatus").textContent = "Status: " + status;
+
+      showView("success");
+    });
+
+    document.getElementById("btnEditPembayaran").addEventListener("click", () => {
+      showView("pay");
+      updatePaymentUI();
+    });
+
+    document.getElementById("btnPesananBaru").addEventListener("click", () => {
+      order.clear();
+      activeItemKode = null;
+      qtyBuffer = "";
+      payBuffer = "";
+      payGivenAmount = 0;
+
+      // reset status default
+      document.getElementById("orderStatus").value = "Menunggu";
+
+      setPayMethod("cash");
+      renderOrder();
+      showView("pos");
+    });
+
+    // init
+    renderOrder();
+    updateBufferUI();
+    updatePaymentUI();
+  </script>
+</body>
+</html>
