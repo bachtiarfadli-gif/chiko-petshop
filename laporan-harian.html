@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Laporan Penjualan - Kasir Pet Shop</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <!-- CSS DASHBOARD (TIDAK DIUBAH) -->
+  <style>
+    :root {
+      --app-bg: #f6f7fb;
+      --card-radius: 16px;
+      --sidebar-w: 280px;
+    }
+    body { background: var(--app-bg); }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: #fff;
+      border-right: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 18px 14px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .brand .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: #f1f5ff;
+      color: #2b5cff;
+      font-weight: 700;
+    }
+
+    .nav-pill {
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #3a3f4b;
+      text-decoration: none;
+    }
+
+    .nav-pill:hover { background: rgba(43, 92, 255, 0.08); }
+
+    .nav-pill.active {
+      background: rgba(43, 92, 255, 0.12);
+      color: #1f4bff;
+      font-weight: 600;
+    }
+
+    .nav-section-title {
+      font-size: 0.78rem;
+      color: #6c757d;
+      letter-spacing: 0.08em;
+      margin: 18px 10px 8px;
+      text-transform: uppercase;
+    }
+
+    .content {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-width: 0;
+    }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 14px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .search { max-width: 520px; }
+
+    .search .form-control {
+      border-radius: 12px;
+      padding-left: 40px;
+    }
+
+    .search .bi-search {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+    }
+
+    .page { padding: 18px; }
+
+    .soft-card {
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: var(--card-radius);
+      box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+      background: #fff;
+    }
+
+    .stat {
+      border-radius: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: linear-gradient(180deg, #fff, #fbfcff);
+    }
+
+    .module-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: #f3f6ff;
+      color: #2b5cff;
+      font-size: 1.25rem;
+    }
+
+    @media (max-width: 992px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: relative; height: auto; }
+    }
+  </style>
+
+  <!-- STYLE TAMBAHAN (BOLEH, TIDAK MENGUBAH CSS DASHBOARD) -->
+  <style>
+    .toolbar-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .toolbar-left{
+      display:flex;
+      align-items:end;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .form-mini label{
+      font-size:.85rem;
+      color:#6c757d;
+      margin-bottom:6px;
+      font-weight:700;
+    }
+    .form-mini .form-control,
+    .form-mini .form-select{
+      border-radius:12px;
+      min-height:42px;
+    }
+
+    .export-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .export-btns{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .export-btns .btn{
+      border-radius:10px;
+      font-weight:800;
+      padding:8px 12px;
+    }
+
+    .mini-search{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .mini-search label{
+      font-size:.9rem;
+      color:#6c757d;
+      font-weight:700;
+    }
+    .mini-search .form-control{
+      border-radius:12px;
+      min-height:42px;
+      min-width:220px;
+    }
+
+    .entries-row{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:#6c757d;
+      font-size:.9rem;
+      flex-wrap:wrap;
+    }
+    .entries-row .form-select{
+      border-radius:10px;
+      min-height:38px;
+      width:auto;
+      font-weight:700;
+    }
+
+    th.sortable{ cursor:pointer; user-select:none; }
+    th.sortable:hover{ background: rgba(43, 92, 255, 0.06); }
+    .sort-ind{ margin-left:6px; font-size:.8rem; color:#6c757d; }
+
+    tr.row-click{ cursor:pointer; }
+    tr.row-click:hover{ background: rgba(43,92,255,0.06); }
+
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- SIDEBAR (TETAP, JANGAN DIUBAH) -->
+    <aside class="sidebar">
+      <div class="brand mb-2">
+        <div class="logo">PS</div>
+        <div class="w-100">
+          <div class="fw-semibold">Pet Shop Kasir</div>
+          <div class="text-muted small">Dashboard</div>
+        </div>
+      </div>
+
+          <div class="nav-section-title">Menu Kasir</div>
+      <nav class="d-grid gap-1">
+        <a class="nav-pill" href="dashboard-kasir.html"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a class="nav-pill" href="transaksi.html"><i class="bi bi-cart-check"></i> Transaksi (Kasir)</a>
+        <a class="nav-pill" href="produk.html"><i class="bi bi-box-seam"></i> Produk</a>
+        <a class="nav-pill" href="riwayat-transaksi.html"><i class="bi bi-clock-history"></i> Riwayat Transaksi</a>
+        <a class="nav-pill" href="pelanggan.html"><i class="bi bi-people"></i> Data Pelanggan</a>
+        <a class="nav-pill" href="grooming-order.html"><i class="bi bi-scissors"></i> Order Grooming</a>
+        <a class="nav-pill" href="laporan-harian.html"><i class="bi bi-file-earmark-text"></i> Laporan Harian</a>
+      </nav>
+
+      <div class="nav-section-title">Akun</div>
+      <div class="d-grid gap-1">
+        <a class="nav-pill" href="#"><i class="bi bi-sliders"></i> Pengaturan</a>
+        <a class="nav-pill" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </div>
+    </aside>
+
+
+    <!-- CONTENT -->
+    <section class="content">
+      <header class="topbar">
+        <div class="d-flex align-items-center justify-content-between gap-3">
+          <div>
+            <div class="fw-semibold">Laporan Penjualan</div>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-light border rounded-3" type="button" title="Notifikasi">
+              <i class="bi bi-bell"></i>
+            </button>
+
+            <div class="dropdown">
+              <button class="btn btn-light border rounded-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle me-1"></i> Kasir
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#">Profil</a></li>
+                <li><a class="dropdown-item" href="#">Pengaturan</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><a class="dropdown-item" href="#">Logout</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="page">
+
+        <!-- HEADER KECIL -->
+        <div class="mb-2">
+          <div class="text-primary fw-semibold" style="font-size:.95rem;">Laporan semua penjualan</div>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="soft-card p-3 mb-3">
+          <div class="toolbar-row">
+            <div class="toolbar-left">
+              <div class="form-mini">
+                <label class="form-label">Tanggal mulai</label>
+                <input id="tglMulai" type="date" class="form-control" />
+              </div>
+
+              <div class="form-mini">
+                <label class="form-label">Tanggal selesai</label>
+                <input id="tglSelesai" type="date" class="form-control" />
+              </div>
+
+              <div class="form-mini">
+                <label class="form-label">Status</label>
+                <select id="filterStatus" class="form-select">
+                  <option value="">Semua</option>
+                  <option value="Selesai">Selesai</option>
+                  <option value="Dibatalkan">Dibatalkan</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
+
+              <div class="form-mini">
+                <label class="form-label d-block">&nbsp;</label>
+                <button id="btnLihat" class="btn btn-primary" type="button" style="border-radius:12px; font-weight:900; padding:10px 14px;">
+                  Lihat
+                </button>
+              </div>
+            </div>
+
+            <span class="badge text-bg-light border" id="infoHasil">
+              <i class="bi bi-list-ul me-1"></i> Menampilkan semua
+            </span>
+          </div>
+
+          <!-- EXPORT + SEARCH + SHOW ENTRIES -->
+          <div class="export-row">
+            <div class="entries-row">
+              Show
+              <select id="showEntries" class="form-select form-select-sm">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              entries
+            </div>
+
+            <div class="export-btns">
+              <button class="btn btn-danger" type="button" id="btnPDF">
+                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+              </button>
+              <button class="btn btn-success" type="button" id="btnExcel">
+                <i class="bi bi-file-earmark-excel me-1"></i> Excel
+              </button>
+              <button class="btn btn-success" type="button" id="btnCSV">
+                <i class="bi bi-filetype-csv me-1"></i> Csv
+              </button>
+              <button class="btn btn-primary" type="button" id="btnPrint">
+                <i class="bi bi-printer me-1"></i> Print
+              </button>
+            </div>
+
+            <div class="mini-search">
+              <label for="searchText" class="mb-0">Search:</label>
+              <input id="searchText" class="form-control" placeholder="Cari pelanggan / status..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="soft-card p-3 mb-3">
+          <div class="table-responsive">
+            <table class="table align-middle" id="tabelPenjualan">
+              <thead class="table-light">
+                <tr>
+                  <th class="sortable" data-sort="no">No <span class="sort-ind" id="ind-no">↕</span></th>
+                  <th class="sortable" data-sort="pelanggan">Nama Pelanggan <span class="sort-ind" id="ind-pelanggan">↕</span></th>
+                  <th class="sortable" data-sort="tanggal">Tanggal <span class="sort-ind" id="ind-tanggal">↕</span></th>
+                  <th class="sortable text-end" data-sort="jumlah">Jumlah <span class="sort-ind" id="ind-jumlah">↕</span></th>
+                  <th class="sortable" data-sort="status">Status <span class="sort-ind" id="ind-status">↕</span></th>
+                </tr>
+              </thead>
+              <tbody><!-- render --></tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <footer class="text-muted small mt-4">© 2026 Chicko Pet Shop</footer>
+      </main>
+    </section>
+  </div>
+
+  <!-- MODAL DETAIL (opsional) -->
+  <div class="modal fade" id="modalDetail" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content" style="border-radius:14px;">
+        <div class="modal-header">
+          <div>
+            <div class="fw-semibold">Detail Penjualan</div>
+            <div class="text-muted small" id="mSub">-</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="soft-card p-3">
+            <div class="row g-2">
+              <div class="col-12 col-md-4">
+                <div class="text-muted small">Nama Pelanggan</div>
+                <div class="fw-semibold" id="mPelanggan">-</div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="text-muted small">Tanggal</div>
+                <div class="fw-semibold mono" id="mTanggal">-</div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="text-muted small">Status</div>
+                <div class="fw-semibold" id="mStatus">-</div>
+              </div>
+              <div class="col-12">
+                <div class="text-muted small">Jumlah</div>
+                <div class="fw-semibold" id="mJumlah">-</div>
+              </div>
+              <div class="col-12">
+                <div class="text-muted small">Catatan</div>
+                <div class="text-muted" id="mCatatan">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal" type="button">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS: Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ====== Active menu sidebar ======
+    (function setActiveSidebar() {
+      const links = document.querySelectorAll(".nav-pill[href]");
+      const current = (location.pathname.split("/").pop() || "laporan-penjualan.html").toLowerCase();
+      links.forEach((a) => {
+        const href = (a.getAttribute("href") || "").toLowerCase();
+        a.classList.toggle("active", href === current);
+      });
+    })();
+
+    const idr = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" });
+    function rupiah(n) { return idr.format(Number(n || 0)); }
+
+    // ====== DATA DEMO ======
+    // status: Selesai | Dibatalkan | Pending
+    const dataPenjualan = [
+      { no: 1, pelanggan: "Cyndi", tanggal: "2022-10-06", jumlah: 12530000, status: "Selesai", catatan:"-" },
+      { no: 2, pelanggan: "Amron Akhsanul 'Arif'", tanggal: "2022-10-06", jumlah: 4547000, status: "Selesai", catatan:"-" },
+      { no: 3, pelanggan: "Aliando Pradana", tanggal: "2022-10-07", jumlah: 4550000, status: "Selesai", catatan:"-" },
+      { no: 4, pelanggan: "Cyndi", tanggal: "2022-10-06", jumlah: 5622000, status: "Dibatalkan", catatan:"Pembayaran dibatalkan." },
+      { no: 5, pelanggan: "Amron Akhsanul 'Arif'", tanggal: "2022-10-07", jumlah: 24944000, status: "Dibatalkan", catatan:"Stok tidak cukup." },
+      { no: 6, pelanggan: "Cyndi", tanggal: "2022-10-07", jumlah: 6920000, status: "Dibatalkan", catatan:"-" },
+      { no: 7, pelanggan: "3CLOWN THRIFT", tanggal: "2022-10-07", jumlah: 19500000, status: "Dibatalkan", catatan:"-" },
+      { no: 8, pelanggan: "3CLOWN THRIFT", tanggal: "2022-10-08", jumlah: 15700000, status: "Selesai", catatan:"-" },
+      { no: 9, pelanggan: "Rina", tanggal: "2022-10-09", jumlah: 75000, status: "Pending", catatan:"Menunggu pembayaran." },
+    ];
+
+    // ====== SORT STATE ======
+    let sortKey = "no";
+    let sortDir = "asc";
+
+    function setSortIndicators() {
+      const keys = ["no","pelanggan","tanggal","jumlah","status"];
+      keys.forEach(k => {
+        const el = document.getElementById("ind-"+k);
+        if (el) el.textContent = "↕";
+      });
+      const arrow = sortDir === "asc" ? "↑" : "↓";
+      const active = document.getElementById("ind-"+sortKey);
+      if (active) active.textContent = arrow;
+    }
+
+    function compare(a, b) {
+      let va = a[sortKey];
+      let vb = b[sortKey];
+
+      if (sortKey === "pelanggan" || sortKey === "status") {
+        va = String(va).toLowerCase();
+        vb = String(vb).toLowerCase();
+      } else if (sortKey === "tanggal") {
+        va = String(va);
+        vb = String(vb);
+      } else {
+        va = Number(va || 0);
+        vb = Number(vb || 0);
+      }
+
+      if (va < vb) return sortDir === "asc" ? -1 : 1;
+      if (va > vb) return sortDir === "asc" ? 1 : -1;
+      return 0;
+    }
+
+    // ====== FILTER ======
+    function getFiltered() {
+      const q = (document.getElementById("searchText").value || "").trim().toLowerCase();
+      const st = (document.getElementById("filterStatus").value || "").trim().toLowerCase();
+      const from = document.getElementById("tglMulai").value;
+      const to = document.getElementById("tglSelesai").value;
+
+      const rows = dataPenjualan.filter(r => {
+        const blob = `${r.no} ${r.pelanggan} ${r.tanggal} ${r.status} ${r.jumlah}`.toLowerCase();
+        const passQ = q ? blob.includes(q) : true;
+
+        const passStatus = st ? String(r.status).toLowerCase() === st : true;
+
+        let passDate = true;
+        if (from) passDate = passDate && (String(r.tanggal) >= from);
+        if (to) passDate = passDate && (String(r.tanggal) <= to);
+
+        return passQ && passStatus && passDate;
+      });
+
+      rows.sort(compare);
+      return rows;
+    }
+
+    // ====== PAGING (Show entries) ======
+    let pageSize = 10;
+
+    function render() {
+      const tbody = document.querySelector("#tabelPenjualan tbody");
+      tbody.innerHTML = "";
+
+      const rowsAll = getFiltered();
+      const rows = rowsAll.slice(0, pageSize); // demo: hanya potong sesuai entries (tanpa paging halaman)
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-muted">Tidak ada data.</td></tr>`;
+      } else {
+        rows.forEach(r => {
+          const tr = document.createElement("tr");
+          tr.className = "row-click";
+          tr.innerHTML = `
+            <td class="fw-semibold">${r.no}</td>
+            <td>${r.pelanggan}</td>
+            <td class="mono">${r.tanggal}</td>
+            <td class="text-end fw-semibold">${rupiah(r.jumlah)}</td>
+            <td>${badgeStatus(r.status)}</td>
+          `;
+          tr.addEventListener("click", () => openDetail(r));
+          tbody.appendChild(tr);
+        });
+      }
+
+      const info = document.getElementById("infoHasil");
+      info.innerHTML = `<i class="bi bi-funnel me-1"></i> Hasil: ${rowsAll.length} data`;
+
+      setSortIndicators();
+    }
+
+    function badgeStatus(s) {
+      const v = String(s || "").toLowerCase();
+      if (v === "selesai") return `<span class="badge text-bg-success">sudah kirim bukti</span>`;
+      if (v === "dibatalkan") return `<span class="badge text-bg-secondary">dibatalkan</span>`;
+      return `<span class="badge text-bg-warning">pending</span>`;
+    }
+
+    function openDetail(r) {
+      document.getElementById("mSub").textContent = `Klik "Tutup" untuk kembali | ${new Date().toLocaleString("id-ID")}`;
+      document.getElementById("mPelanggan").textContent = r.pelanggan;
+      document.getElementById("mTanggal").textContent = r.tanggal;
+      document.getElementById("mStatus").innerHTML = badgeStatus(r.status);
+      document.getElementById("mJumlah").textContent = rupiah(r.jumlah);
+      document.getElementById("mCatatan").textContent = (r.catatan || "-");
+      bootstrap.Modal.getOrCreateInstance(document.getElementById("modalDetail")).show();
+    }
+
+    // ====== EXPORT (DEMO) ======
+    function downloadCSV(filename, rows) {
+      const esc = (v) => `"${String(v ?? "").replaceAll('"', '""')}"`;
+      const header = ["No","Nama Pelanggan","Tanggal","Jumlah","Status"];
+      const lines = [
+        header.map(esc).join(","),
+        ...rows.map(r => [r.no, r.pelanggan, r.tanggal, r.jumlah, r.status].map(esc).join(","))
+      ];
+      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById("btnCSV").addEventListener("click", () => {
+      const rows = getFiltered();
+      downloadCSV("laporan_penjualan.csv", rows);
+    });
+
+    document.getElementById("btnPDF").addEventListener("click", () => {
+      alert("Demo PDF: Untuk PDF real gunakan library (jsPDF) atau generate dari server.");
+    });
+    document.getElementById("btnExcel").addEventListener("click", () => {
+      alert("Demo Excel: Untuk Excel real gunakan library (SheetJS) atau generate dari server.");
+    });
+    document.getElementById("btnPrint").addEventListener("click", () => window.print());
+
+    // ====== EVENTS ======
+    document.getElementById("btnLihat").addEventListener("click", render);
+    document.getElementById("searchText").addEventListener("input", render);
+    document.getElementById("filterStatus").addEventListener("change", render);
+    document.getElementById("tglMulai").addEventListener("change", render);
+    document.getElementById("tglSelesai").addEventListener("change", render);
+
+    document.getElementById("showEntries").addEventListener("change", function(){
+      pageSize = Number(this.value || 10);
+      render();
+    });
+
+    document.querySelectorAll("th.sortable").forEach(th => {
+      th.addEventListener("click", () => {
+        const k = th.getAttribute("data-sort");
+        if (sortKey === k) sortDir = (sortDir === "asc") ? "desc" : "asc";
+        else { sortKey = k; sortDir = "asc"; }
+        render();
+      });
+    });
+
+    // init default tanggal kosong (biar "semua")
+    render();
+  </script>
+</body>
+</html>

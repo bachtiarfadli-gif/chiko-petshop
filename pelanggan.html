@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Data Pelanggan - Kasir Pet Shop</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <!-- CSS DASHBOARD (TIDAK DIUBAH) -->
+  <style>
+    :root {
+      --app-bg: #f6f7fb;
+      --card-radius: 16px;
+      --sidebar-w: 280px;
+    }
+    body { background: var(--app-bg); }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: #fff;
+      border-right: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 18px 14px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .brand .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: #f1f5ff;
+      color: #2b5cff;
+      font-weight: 700;
+    }
+
+    .nav-pill {
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #3a3f4b;
+      text-decoration: none;
+    }
+
+    .nav-pill:hover { background: rgba(43, 92, 255, 0.08); }
+
+    .nav-pill.active {
+      background: rgba(43, 92, 255, 0.12);
+      color: #1f4bff;
+      font-weight: 600;
+    }
+
+    .nav-section-title {
+      font-size: 0.78rem;
+      color: #6c757d;
+      letter-spacing: 0.08em;
+      margin: 18px 10px 8px;
+      text-transform: uppercase;
+    }
+
+    .content {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-width: 0;
+    }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 14px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .search { max-width: 520px; }
+
+    .search .form-control {
+      border-radius: 12px;
+      padding-left: 40px;
+    }
+
+    .search .bi-search {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+    }
+
+    .page { padding: 18px; }
+
+    .soft-card {
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: var(--card-radius);
+      box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+      background: #fff;
+    }
+
+    .stat {
+      border-radius: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: linear-gradient(180deg, #fff, #fbfcff);
+    }
+
+    .module-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: #f3f6ff;
+      color: #2b5cff;
+      font-size: 1.25rem;
+    }
+
+    @media (max-width: 992px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: relative; height: auto; }
+    }
+  </style>
+
+  <!-- STYLE TAMBAHAN KHUSUS PELANGGAN (BOLEH, TIDAK MENGUBAH CSS DASHBOARD) -->
+  <style>
+    tr.row-click { cursor: pointer; }
+    tr.row-click:hover { background: rgba(43, 92, 255, 0.06); }
+
+    .detail-block-title { font-weight: 700; margin-bottom: 6px; }
+    .kv {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+    .kv .k { color: #6c757d; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+    /* transaksi di dalam modal pelanggan bisa diklik */
+    tr.trx-click { cursor: pointer; }
+    tr.trx-click:hover { background: rgba(43, 92, 255, 0.06); }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- SIDEBAR (TETAP) -->
+    <aside class="sidebar">
+      <div class="brand mb-2">
+        <div class="logo">PS</div>
+        <div class="w-100">
+          <div class="fw-semibold">Pet Shop Kasir</div>
+          <div class="text-muted small">Dashboard</div>
+        </div>
+      </div>
+
+      <div class="nav-section-title">Menu Kasir</div>
+      <nav class="d-grid gap-1">
+        <a class="nav-pill" href="dashboard-kasir.html"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a class="nav-pill" href="transaksi.html"><i class="bi bi-cart-check"></i> Transaksi (Kasir)</a>
+        <a class="nav-pill" href="produk.html"><i class="bi bi-box-seam"></i> Produk</a>
+        <a class="nav-pill" href="riwayat-transaksi.html"><i class="bi bi-clock-history"></i> Riwayat Transaksi</a>
+        <a class="nav-pill" href="pelanggan.html"><i class="bi bi-people"></i> Data Pelanggan</a>
+        <a class="nav-pill" href="grooming-order.html"><i class="bi bi-scissors"></i> Order Grooming</a>
+        <a class="nav-pill" href="laporan-harian.html"><i class="bi bi-file-earmark-text"></i> Laporan Harian</a>
+      </nav>
+
+      <div class="nav-section-title">Akun</div>
+      <div class="d-grid gap-1">
+        <a class="nav-pill" href="#"><i class="bi bi-sliders"></i> Pengaturan</a>
+        <a class="nav-pill" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </div>
+
+ 
+    </aside>
+
+    <!-- CONTENT -->
+    <section class="content">
+      <header class="topbar">
+        <div class="d-flex align-items-center justify-content-between gap-3">
+          <div>
+            <div class="fw-semibold">Data Pelanggan</div>
+          </div>
+
+          <div class="search position-relative flex-grow-1 d-none d-md-block">
+            <i class="bi bi-search"></i>
+            <input id="searchTop" class="form-control" placeholder="Cari ID / nama / kontak..." />
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-light border rounded-3" type="button" title="Notifikasi">
+              <i class="bi bi-bell"></i>
+            </button>
+
+            <div class="dropdown">
+              <button class="btn btn-light border rounded-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle me-1"></i> Kasir
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#">Profil</a></li>
+                <li><a class="dropdown-item" href="#">Pengaturan</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><a class="dropdown-item" href="#">Logout</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="page">
+
+        <!-- CARD: FILTER -->
+        <div class="soft-card p-3 mb-3">
+          <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+            <div>
+              <div class="fw-semibold">Daftar Pelanggan</div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <div class="position-relative">
+                <i class="bi bi-search position-absolute" style="left:14px; top:50%; transform:translateY(-50%); color:#6c757d;"></i>
+                <input id="searchLocal" class="form-control" style="border-radius:12px; padding-left:40px; min-width:280px;" placeholder="Cari: CUS-..., Nama, No HP..." />
+              </div>
+              <button id="btnReset" class="btn btn-outline-secondary rounded-3" type="button" title="Reset">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TABLE: PELANGGAN -->
+        <div class="soft-card p-3 mb-3">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div>
+              <div class="fw-semibold">Tabel Data Pelanggan</div>
+            </div>
+
+            <span id="infoHasil" class="badge text-bg-light border">
+              <i class="bi bi-list-ul me-1"></i> Menampilkan semua
+            </span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table align-middle" id="tabelPelanggan">
+              <thead class="table-light">
+                <tr>
+                  <th>ID Pelanggan</th>
+                  <th>Nama Pelanggan</th>
+                  <th>Kontak</th>
+                  <th>Catatan Pelanggan</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- render via JS -->
+              </tbody>
+            </table>
+          </div>
+
+       
+        </div>
+
+        <footer class="text-muted small mt-4">© 2026 Chicko Pet Shop</footer>
+      </main>
+    </section>
+  </div>
+
+  <!-- MODAL DETAIL PELANGGAN -->
+  <div class="modal fade" id="modalPelanggan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content" style="border-radius: 14px;">
+        <div class="modal-header">
+          <div>
+            <div class="fw-semibold">Detail Pelanggan</div>
+            <div class="text-muted small" id="pelSub">-</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="soft-card p-3 mb-3">
+            <div class="detail-block-title">Informasi Pelanggan</div>
+            <div class="kv">
+              <div class="k">ID</div><div class="v mono" id="pId">-</div>
+              <div class="k">Nama</div><div class="v" id="pNama">-</div>
+              <div class="k">Kontak</div><div class="v" id="pKontak">-</div>
+            </div>
+          </div>
+
+          <div class="soft-card p-3 mb-3">
+            <div class="detail-block-title">Catatan Pelanggan</div>
+            <div class="text-muted" id="pCatatan">-</div>
+          </div>
+
+          <div class="soft-card p-3">
+            <div class="detail-block-title">List Transaksi</div>
+            <div class="text-muted small mb-2">Klik salah satu transaksi untuk melihat detail.</div>
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>No. Transaksi</th>
+                    <th>Tanggal</th>
+                    <th>Kasir</th>
+                    <th class="text-end">Total</th>
+                    <th>Metode</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="pTransaksi">
+                  <!-- render -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal" type="button">
+            Tutup
+          </button>
+          <button class="btn btn-primary rounded-3" type="button" id="btnWhatsAppDemo">
+            <i class="bi bi-whatsapp me-1"></i> Hubungi (Demo)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DETAIL TRANSAKSI (DARI MODAL PELANGGAN) -->
+  <div class="modal fade" id="modalTrx" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content" style="border-radius: 14px;">
+        <div class="modal-header">
+          <div>
+            <div class="fw-semibold">Detail Transaksi</div>
+            <div class="text-muted small" id="trxSub">-</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="soft-card p-3 mb-3">
+            <div class="detail-block-title">Informasi</div>
+            <div class="kv">
+              <div class="k">No. Transaksi</div><div class="v mono" id="tId">-</div>
+              <div class="k">Pelanggan</div><div class="v" id="tPelanggan">-</div>
+              <div class="k">Kasir</div><div class="v" id="tKasir">-</div>
+              <div class="k">Tanggal</div><div class="v text-muted" id="tTanggal">-</div>
+              <div class="k">Metode</div><div class="v" id="tMetode">-</div>
+              <div class="k">Status</div><div class="v" id="tStatus">-</div>
+            </div>
+          </div>
+
+          <div class="soft-card p-3 mb-3">
+            <div class="detail-block-title">Produk yang diorder</div>
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Produk</th>
+                    <th class="text-end">Harga</th>
+                    <th class="text-end">Qty</th>
+                    <th class="text-end">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody id="tItems">
+                  <!-- render -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="soft-card p-3 mb-3">
+            <div class="detail-block-title">Pembayaran</div>
+            <div class="kv">
+              <div class="k">Total</div><div class="v fw-semibold" id="tTotal">-</div>
+              <div class="k">Bayar</div><div class="v" id="tBayar">-</div>
+              <div class="k">Kembalian</div><div class="v" id="tKembali">-</div>
+            </div>
+          </div>
+
+          <div class="soft-card p-3">
+            <div class="detail-block-title">Catatan</div>
+            <div class="text-muted" id="tCatatan">-</div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal" type="button">Tutup</button>
+          <button class="btn btn-primary rounded-3" type="button" id="btnPrintDemo">
+            <i class="bi bi-printer me-1"></i> Cetak (Demo)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS: Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ====== Active menu sidebar berdasarkan nama file halaman ======
+    (function setActiveSidebar() {
+      const links = document.querySelectorAll(".nav-pill[href]");
+      const current = (location.pathname.split("/").pop() || "pelanggan.html").toLowerCase();
+      links.forEach((a) => {
+        const href = (a.getAttribute("href") || "").toLowerCase();
+        a.classList.toggle("active", href === current);
+      });
+    })();
+
+    // ====== FORMAT RUPIAH ======
+    const idr = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" });
+    function rupiah(n) { return idr.format(Number(n || 0)); }
+
+    // ====== DATA CONTOH PELANGGAN ======
+    const pelangganList = [
+      { id: "CUS-0001", nama: "Rina", kontak: "0812-1111-2222", catatan: "Punya 2 kucing, alergi parfum kuat." },
+      { id: "CUS-0002", nama: "Dodi", kontak: "0821-3333-4444", catatan: "Sering beli snack anjing, suka promo." },
+      { id: "CUS-0003", nama: "Salsa", kontak: "0813-5555-6666", catatan: "Minta packing rapih, sering titip order." },
+      { id: "CUS-0004", nama: "Bagas", kontak: "0852-7777-8888", catatan: "-" },
+    ];
+
+    // ====== DATA CONTOH TRANSAKSI (DIHUBUNGKAN KE PELANGGAN) ======
+    // tambahkan detail lengkap: items, bayar, kembalian, catatan
+    const transaksiList = [
+      {
+        trx: "TRX-000201",
+        pelangganId: "CUS-0001",
+        tanggal: "2026-01-06 10:15",
+        kasir: "Budi",
+        total: 120000,
+        metode: "Kas",
+        status: "Selesai",
+        bayar: 150000,
+        kembalian: 30000,
+        catatan: "Tolong bungkus terpisah untuk snack.",
+        items: [
+          { nama: "Pakan Kucing 1kg", harga: 40000, qty: 1 },
+          { nama: "Pasir Kucing 10L", harga: 45000, qty: 1 },
+          { nama: "Mainan Kucing", harga: 35000, qty: 1 },
+        ],
+      },
+      {
+        trx: "TRX-000205",
+        pelangganId: "CUS-0001",
+        tanggal: "2026-01-06 17:45",
+        kasir: "Sari",
+        total: 45000,
+        metode: "QRIS",
+        status: "Selesai",
+        bayar: 45000,
+        kembalian: 0,
+        catatan: "-",
+        items: [
+          { nama: "Pasir Kucing 10L", harga: 45000, qty: 1 },
+        ],
+      },
+      {
+        trx: "TRX-000202",
+        pelangganId: "CUS-0002",
+        tanggal: "2026-01-06 11:20",
+        kasir: "Sari",
+        total: 75000,
+        metode: "QRIS",
+        status: "Selesai",
+        bayar: 75000,
+        kembalian: 0,
+        catatan: "Minta rekomendasi vitamin kucing yang cocok.",
+        items: [
+          { nama: "Snack Anjing", harga: 30000, qty: 1 },
+          { nama: "Shampoo Grooming", harga: 25000, qty: 1 },
+          { nama: "Pakan Kucing 1kg", harga: 40000, qty: 1 },
+        ],
+      },
+      {
+        trx: "TRX-000203",
+        pelangganId: "CUS-0003",
+        tanggal: "2026-01-06 12:05",
+        kasir: "Budi",
+        total: 55000,
+        metode: "Kartu",
+        status: "Pending",
+        bayar: 0,
+        kembalian: 0,
+        catatan: "Nanti diambil sore, mohon ditahan.",
+        items: [
+          { nama: "Vitamin Kucing", harga: 55000, qty: 1 },
+        ],
+      },
+      {
+        trx: "TRX-000204",
+        pelangganId: "CUS-0004",
+        tanggal: "2026-01-06 13:40",
+        kasir: "Sari",
+        total: 90000,
+        metode: "Kas",
+        status: "Selesai",
+        bayar: 100000,
+        kembalian: 10000,
+        catatan: "-",
+        items: [
+          { nama: "Pakan Kucing 1kg", harga: 40000, qty: 2 },
+          { nama: "Snack Anjing", harga: 30000, qty: 1 },
+        ],
+      },
+    ];
+
+    // ====== RENDER TABLE PELANGGAN ======
+    function renderTable(data) {
+      const tbody = document.querySelector("#tabelPelanggan tbody");
+      tbody.innerHTML = "";
+
+      data.forEach((p) => {
+        const tr = document.createElement("tr");
+        tr.className = "row-click";
+        tr.setAttribute("data-id", p.id);
+
+        tr.innerHTML = `
+          <td class="fw-semibold mono">${p.id}</td>
+          <td>${p.nama}</td>
+          <td>${p.kontak}</td>
+          <td class="text-muted">${p.catatan || "-"}</td>
+        `;
+
+        tr.addEventListener("click", () => openDetailPelanggan(p.id));
+        tbody.appendChild(tr);
+      });
+
+      const info = document.getElementById("infoHasil");
+      info.innerHTML = `<i class="bi bi-funnel me-1"></i> Hasil: ${data.length} pelanggan`;
+    }
+
+    // ====== OPEN DETAIL PELANGGAN ======
+    function openDetailPelanggan(pelangganId) {
+      const p = pelangganList.find(x => x.id === pelangganId);
+      if (!p) return;
+
+      document.getElementById("pelSub").textContent =
+        `Klik "Tutup" untuk kembali | ${new Date().toLocaleString("id-ID")}`;
+
+      document.getElementById("pId").textContent = p.id;
+      document.getElementById("pNama").textContent = p.nama;
+      document.getElementById("pKontak").textContent = p.kontak;
+      document.getElementById("pCatatan").textContent = (p.catatan || "-");
+
+      // transaksi pelanggan (klik -> buka detail transaksi)
+      const rows = transaksiList.filter(t => t.pelangganId === p.id);
+      const tbody = document.getElementById("pTransaksi");
+      tbody.innerHTML = "";
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-muted">Belum ada transaksi untuk pelanggan ini.</td>
+          </tr>
+        `;
+      } else {
+        rows.forEach((t) => {
+          const statusBadge = t.status.toLowerCase() === "selesai"
+            ? '<span class="badge text-bg-success">Selesai</span>'
+            : '<span class="badge text-bg-warning">Pending</span>';
+
+          const tr = document.createElement("tr");
+          tr.className = "trx-click";
+          tr.setAttribute("data-trx", t.trx);
+
+          tr.innerHTML = `
+            <td class="fw-semibold mono">${t.trx}</td>
+            <td class="text-muted">${t.tanggal}</td>
+            <td>${t.kasir}</td>
+            <td class="text-end fw-semibold">${rupiah(t.total)}</td>
+            <td>${t.metode}</td>
+            <td>${statusBadge}</td>
+          `;
+
+          tr.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openDetailTransaksi(t.trx);
+          });
+
+          tbody.appendChild(tr);
+        });
+      }
+
+      bootstrap.Modal.getOrCreateInstance(document.getElementById("modalPelanggan")).show();
+    }
+
+    // ====== OPEN DETAIL TRANSAKSI ======
+    function openDetailTransaksi(trxId) {
+      const t = transaksiList.find(x => x.trx === trxId);
+      if (!t) return;
+
+      const pel = pelangganList.find(p => p.id === t.pelangganId);
+
+      document.getElementById("trxSub").textContent =
+        `Dibuka dari detail pelanggan | ${new Date().toLocaleString("id-ID")}`;
+
+      document.getElementById("tId").textContent = t.trx;
+      document.getElementById("tPelanggan").textContent = pel ? pel.nama : "-";
+      document.getElementById("tKasir").textContent = t.kasir;
+      document.getElementById("tTanggal").textContent = t.tanggal;
+      document.getElementById("tMetode").textContent = t.metode;
+
+      const statusHtml = t.status.toLowerCase() === "selesai"
+        ? '<span class="badge text-bg-success">Selesai</span>'
+        : '<span class="badge text-bg-warning">Pending</span>';
+      document.getElementById("tStatus").innerHTML = statusHtml;
+
+      // items
+      const itemsTbody = document.getElementById("tItems");
+      itemsTbody.innerHTML = "";
+      (t.items || []).forEach((it) => {
+        const subtotal = it.harga * it.qty;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="fw-semibold">${it.nama}</td>
+          <td class="text-end">${rupiah(it.harga)}</td>
+          <td class="text-end">${it.qty}</td>
+          <td class="text-end fw-semibold">${rupiah(subtotal)}</td>
+        `;
+        itemsTbody.appendChild(row);
+      });
+
+      // pembayaran
+      document.getElementById("tTotal").textContent = rupiah(t.total);
+      document.getElementById("tBayar").textContent = (t.bayar && t.bayar > 0) ? rupiah(t.bayar) : "-";
+      document.getElementById("tKembali").textContent = (t.bayar && t.bayar > 0) ? rupiah(t.kembalian) : "-";
+      document.getElementById("tCatatan").textContent = (t.catatan || "-");
+
+      // tampilkan modal transaksi (tanpa nutup modal pelanggan)
+      bootstrap.Modal.getOrCreateInstance(document.getElementById("modalTrx")).show();
+    }
+
+    // ====== FILTER SEARCH (TOP + LOCAL) ======
+    function applyFilter(keyword) {
+      const q = (keyword || "").trim().toLowerCase();
+      const filtered = pelangganList.filter((p) => {
+        const blob = `${p.id} ${p.nama} ${p.kontak} ${p.catatan || ""}`.toLowerCase();
+        return q === "" ? true : blob.includes(q);
+      });
+
+      renderTable(filtered);
+
+      const info = document.getElementById("infoHasil");
+      if (!q) info.innerHTML = '<i class="bi bi-list-ul me-1"></i> Menampilkan semua';
+    }
+
+    document.getElementById("searchLocal").addEventListener("input", function () {
+      applyFilter(this.value);
+      document.getElementById("searchTop").value = this.value;
+    });
+
+    document.getElementById("searchTop").addEventListener("input", function () {
+      applyFilter(this.value);
+      document.getElementById("searchLocal").value = this.value;
+    });
+
+    document.getElementById("btnReset").addEventListener("click", function () {
+      document.getElementById("searchLocal").value = "";
+      document.getElementById("searchTop").value = "";
+      applyFilter("");
+      document.getElementById("searchLocal").focus();
+    });
+
+    // ====== HUBUNGI DEMO ======
+    document.getElementById("btnWhatsAppDemo").addEventListener("click", () => {
+      const nama = document.getElementById("pNama").textContent || "Pelanggan";
+      alert("Demo: membuka WhatsApp untuk menghubungi " + nama + ".\n(Implementasi: wa.me / deep link)");
+    });
+
+    // ====== PRINT DEMO ======
+    document.getElementById("btnPrintDemo").addEventListener("click", () => {
+      alert("Demo: Cetak struk / invoice.\n(Implementasi: window.print() / generate PDF / kirim ke printer)");
+    });
+
+    // init
+    renderTable(pelangganList);
+  </script>
+</body>
+</html>
