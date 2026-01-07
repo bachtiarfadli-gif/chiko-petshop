@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login Kasir</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- STYLE DARI KAMU -->
+  <style>
+    :root {
+      --app-bg: #f6f7fb;
+      --card-radius: 16px;
+      --sidebar-w: 280px;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--app-bg);
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+    }
+
+    .soft-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 28px;
+      border-radius: var(--card-radius);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+      background: #fff;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .brand .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: #f1f5ff;
+      color: #2b5cff;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    p {
+      margin: 4px 0 0;
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: #3a3f4b;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #2b5cff;
+      box-shadow: 0 0 0 3px rgba(43, 92, 255, 0.12);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      background: #2b5cff;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1f4bff;
+    }
+
+    .error {
+      margin-top: 12px;
+      color: #dc3545;
+      font-size: 0.85rem;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="soft-card">
+    <div class="brand">
+      <div class="logo">KS</div>
+      <div>
+        <h2>Login Kasir</h2>
+        <p>Silakan masuk ke dashboard</p>
+      </div>
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Masukkan username" required />
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Masukkan password" required />
+      </div>
+
+      <button type="submit">Login</button>
+
+      <div class="error" id="errorMsg">
+        Username atau password salah!
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const errorMsg = document.getElementById("errorMsg");
+
+      if (username === "admin" && password === "admin") {
+        window.location.href = "dashboard-kasir.html";
+      } else {
+        errorMsg.style.display = "block";
+      }
+    });
+  </script>
+
+</body>
+</html>
