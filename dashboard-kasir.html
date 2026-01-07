@@ -1,5 +1,34 @@
 <!doctype html>
 <html lang="id">
+  <script>
+  if (localStorage.getItem("isLogin") !== "true") {
+    window.location.href = "login.html";
+  }
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    // proteksi halaman
+    if (localStorage.getItem("isLogin") !== "true") {
+      window.location.href = "login.html";
+      return;
+    }
+
+    // fungsi logout
+    const btnLogout = document.getElementById("btnLogout");
+    if (btnLogout) {
+      btnLogout.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (confirm("Yakin ingin logout?")) {
+          localStorage.removeItem("isLogin");
+          window.location.href = "login.html";
+        }
+      });
+    }
+
+  });
+</script>
+
 <head>
   <script>
   if (localStorage.getItem("isLogin") !== "true") {
@@ -192,7 +221,9 @@
       <div class="nav-section-title">Akun</div>
       <div class="d-grid gap-1">
         <a class="nav-pill" href="#"><i class="bi bi-sliders"></i> Pengaturan</a>
-        <a class="nav-pill" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a>
+<a class="nav-pill" href="#" id="btnLogout">
+  <i class="bi bi-box-arrow-right"></i> Logout
+</a>
       </div>
     </aside>
 
