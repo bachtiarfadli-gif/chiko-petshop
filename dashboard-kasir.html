@@ -1,6 +1,11 @@
 <!doctype html>
 <html lang="id">
 <head>
+  <script>
+  if (localStorage.getItem("isLogin") !== "true") {
+    window.location.href = "login.html";
+  }
+</script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard Kasir</title>
@@ -141,6 +146,25 @@
   </style>
 </head>
 
+<script>
+  // proteksi halaman
+  if (localStorage.getItem("isLogin") !== "true") {
+    window.location.href = "login.html";
+  }
+
+  // fungsi logout
+  const btnLogout = document.getElementById("btnLogout");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (confirm("Yakin ingin logout?")) {
+        localStorage.removeItem("isLogin");
+        window.location.href = "login.html";
+      }
+    });
+  }
+</script>
+
 <body>
   <div class="app">
 
@@ -195,7 +219,7 @@
                 <li><a class="dropdown-item" href="#">Profil</a></li>
                 <li><a class="dropdown-item" href="#">Pengaturan</a></li>
                 <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="#">Logout</a></li>
+                <li><a class="dropdown-item" href="#" id="btnLogout">Logout</a></li>
               </ul>
             </div>
           </div>
