@@ -1,28 +1,5 @@
 <!doctype html>
 <html lang="id">
-  <script>
-  document.addEventListener("DOMContentLoaded", function () {
-
-    // proteksi halaman
-    if (localStorage.getItem("isLogin") !== "true") {
-      window.location.href = "login.html";
-      return;
-    }
-
-    // fungsi logout
-    const btnLogout = document.getElementById("btnLogout");
-    if (btnLogout) {
-      btnLogout.addEventListener("click", function (e) {
-        e.preventDefault();
-        if (confirm("Yakin ingin logout?")) {
-          localStorage.removeItem("isLogin");
-          window.location.href = "login.html";
-        }
-      });
-    }
-
-  });
-</script>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -31,620 +8,247 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 
-  <!-- CSS DASHBOARD (TIDAK DIUBAH) -->
   <style>
     :root { --app-bg:#f6f7fb; --card-radius:16px; --sidebar-w:280px; }
     body { background: var(--app-bg); }
     .app { min-height:100vh; display:grid; grid-template-columns: var(--sidebar-w) 1fr; }
+
     .sidebar{
       position:sticky; top:0; height:100vh; background:#fff;
       border-right:1px solid rgba(0,0,0,0.06);
-      padding:18px 14px; overflow-y:auto; overscroll-behavior:contain;
+      padding:18px 14px; overflow-y:auto;
     }
-    .brand{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; }
+
+    .brand{ display:flex; align-items:center; gap:10px; padding:10px 12px; }
     .brand .logo{
-      width:36px; height:36px; border-radius:10px; display:grid; place-items:center;
+      width:36px; height:36px; border-radius:10px;
+      display:grid; place-items:center;
       background:#f1f5ff; color:#2b5cff; font-weight:700;
     }
+
     .nav-pill{
-      border-radius:12px; padding:10px 12px; display:flex; align-items:center; gap:10px;
-      color:#3a3f4b; text-decoration:none;
+      border-radius:12px; padding:10px 12px;
+      display:flex; gap:10px; color:#3a3f4b; text-decoration:none;
+    }
+    .nav-pill.active{
+      background: rgba(43,92,255,0.12);
+      color:#1f4bff; font-weight:600;
     }
     .nav-pill:hover{ background: rgba(43,92,255,0.08); }
-    .nav-pill.active{ background: rgba(43,92,255,0.12); color:#1f4bff; font-weight:600; }
+
     .nav-section-title{
-      font-size:0.78rem; color:#6c757d; letter-spacing:0.08em;
+      font-size:.78rem; color:#6c757d;
       margin:18px 10px 8px; text-transform:uppercase;
     }
-    .content{ display:grid; grid-template-rows:auto 1fr; min-width:0; }
+
+    .content{ display:grid; grid-template-rows:auto 1fr; }
     .topbar{
       background:#fff; border-bottom:1px solid rgba(0,0,0,0.06);
       padding:14px 18px; position:sticky; top:0; z-index:10;
     }
-    .search{ max-width:520px; }
-    .search .form-control{ border-radius:12px; padding-left:40px; }
-    .search .bi-search{
-      position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#6c757d;
-    }
+
     .page{ padding:18px; }
+
     .soft-card{
+      background:#fff; border-radius: var(--card-radius);
       border:1px solid rgba(0,0,0,0.06);
-      border-radius: var(--card-radius);
-      box-shadow: 0 8px 24px rgba(16,24,40,0.06);
-      background:#fff;
-    }
-    .stat{
-      border-radius:16px; border:1px solid rgba(0,0,0,0.06);
-      background: linear-gradient(180deg, #fff, #fbfcff);
-    }
-    .module-icon{
-      width:44px; height:44px; border-radius:14px; display:grid; place-items:center;
-      background:#f3f6ff; color:#2b5cff; font-size:1.25rem;
-    }
-    @media (max-width: 992px){
-      .app{ grid-template-columns:1fr; }
-      .sidebar{ position:relative; height:auto; }
-    }
-  </style>
-
-  <!-- STYLE TAMBAHAN (RAPIH & TIDAK TUMPAH TINDIH) -->
-  <style>
-    /* =========================
-       CARD ACTION (2 card atas)
-       ========================= */
-    .card-action{
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 12px;
-
-      padding: 16px;
-      border-radius: 16px;
-      border: 1px solid rgba(0,0,0,0.06);
-      background: linear-gradient(180deg, #fff, #fbfcff);
-
-      min-height: 76px;
+      box-shadow:0 8px 24px rgba(16,24,40,0.06);
     }
 
-    .card-action .left{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-
-    .card-action .title{
-      font-weight: 800;
-      margin: 0;
-      line-height: 1.2;
-      font-size: 1.05rem;
-      letter-spacing: .2px;
-    }
-
-    .card-action .sub{
-      margin: 0;
-      color: #6c757d;
-      font-size: .9rem;
-    }
-
-    .card-action .btn{
-      margin-left: auto;               /* tombol selalu di kanan */
-      border-radius: 12px;
-      font-weight: 800;
-      white-space: nowrap;
-
-      height: 40px;
-      padding: 0 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    /* responsif: tombol turun ke bawah */
-    @media (max-width: 576px){
-      .card-action{ flex-wrap: wrap; }
-      .card-action .btn{
-        width: 100%;
-        margin-left: 0;
-      }
-    }
-
-    /* =========================
-       TABLE INTERACTIVE
-       ========================= */
-    tr.row-click{ cursor: pointer; }
-    tr.row-click:hover{ background: rgba(43,92,255,0.06); }
-
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-                   "Liberation Mono", "Courier New", monospace;
-    }
-
-    /* =========================
-       ANTRIAN (queue)
-       ========================= */
     .queue-row{
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 12px;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      background: #fff;
-    }
-    .queue-row:hover{ background: rgba(43,92,255,0.04); }
-
-    .queue-left{ min-width: 0; }
-    .queue-title{ font-weight: 800; margin: 0; }
-    .queue-sub{ color: #6c757d; margin: 0; font-size: .85rem; }
-
-    .queue-actions{
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: flex-end;
-      flex-wrap: wrap;
+      border:1px solid rgba(0,0,0,0.08);
+      border-radius:12px; padding:10px 12px;
+      display:flex; justify-content:space-between; align-items:center;
     }
 
-    .queue-actions .form-select{
-      border-radius: 10px;
-      padding: 6px 10px;
-      font-weight: 700;
-      min-width: 130px;
-    }
+    .queue-title{ font-weight:800; margin:0; }
+    .queue-sub{ font-size:.85rem; color:#6c757d; margin:0; }
 
-    .btn-detail-mini{
-      border-radius: 10px;
-      padding: 6px 10px;
-      font-weight: 800;
-      font-size: .85rem;
-      line-height: 1.1;
-      white-space: nowrap;
-    }
-
-    /* =========================
-       BADGE STATUS
-       ========================= */
-    .badge-proses{
-      background: rgba(13,110,253,0.12)!important;
-      color: #0d6efd!important;
-      border: 1px solid rgba(13,110,253,0.20);
-    }
     .badge-menunggu{
-      background: rgba(255,193,7,0.18)!important;
-      color: #b58100!important;
-      border: 1px solid rgba(255,193,7,0.30);
+      background: rgba(255,193,7,.18);
+      color:#b58100; border:1px solid rgba(255,193,7,.3);
+    }
+    .badge-proses{
+      background: rgba(13,110,253,.12);
+      color:#0d6efd; border:1px solid rgba(13,110,253,.2);
     }
     .badge-selesai{
-      background: rgba(25,135,84,0.14)!important;
-      color: #198754!important;
-      border: 1px solid rgba(25,135,84,0.25);
-    }
-
-    /* =========================
-       SECTION HEADER ROW
-       ========================= */
-    .section-title-row{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
+      background: rgba(25,135,84,.14);
+      color:#198754; border:1px solid rgba(25,135,84,.25);
     }
   </style>
 </head>
 
 <body>
-  <div class="app">
+<div class="app">
 
-    <!-- SIDEBAR (TETAP, JANGAN DIUBAH) -->
-    <aside class="sidebar">
-      <div class="brand mb-2">
-        <div class="logo">PS</div>
-        <div class="w-100">
-          <div class="fw-semibold">Pet Shop Kasir</div>
-          <div class="text-muted small">Dashboard</div>
-        </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand mb-2">
+      <div class="logo">PS</div>
+      <div>
+        <div class="fw-semibold">Pet Shop Kasir</div>
+        <div class="text-muted small">Dashboard</div>
+      </div>
+    </div>
+
+    <div class="nav-section-title">Menu Kasir</div>
+    <nav class="d-grid gap-1">
+      <a class="nav-pill" href="dashboard-kasir.html"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+      <a class="nav-pill active" href="grooming-order.html"><i class="bi bi-scissors"></i> Order Grooming</a>
+    </nav>
+  </aside>
+
+  <!-- CONTENT -->
+  <section class="content">
+    <header class="topbar">
+      <div class="fw-semibold">Order Grooming</div>
+    </header>
+
+    <main class="page">
+
+      <!-- ANTRIAN -->
+      <div class="soft-card p-3 mb-3">
+        <div class="fw-semibold mb-2">Antrian Grooming</div>
+        <div class="d-grid gap-2" id="listAntrian"></div>
       </div>
 
-      <div class="nav-section-title">Menu Kasir</div>
-      <nav class="d-grid gap-1">
-        <a class="nav-pill" href="dashboard-kasir.html"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
-        <a class="nav-pill" href="transaksi.html"><i class="bi bi-cart-check"></i> Transaksi (Kasir)</a>
-        <a class="nav-pill" href="produk.html"><i class="bi bi-box-seam"></i> Produk</a>
-        <a class="nav-pill" href="riwayat-transaksi.html"><i class="bi bi-clock-history"></i> Riwayat Transaksi</a>
-        <a class="nav-pill" href="pelanggan.html"><i class="bi bi-people"></i> Data Pelanggan</a>
-        <a class="nav-pill" href="grooming-order.html"><i class="bi bi-scissors"></i> Order Grooming</a>
-        <a class="nav-pill" href="laporan-harian.html"><i class="bi bi-file-earmark-text"></i> Laporan Harian</a>
-      </nav>
-
-      <div class="nav-section-title">Akun</div>
-      <div class="d-grid gap-1">
-        <a class="nav-pill" href="#"><i class="bi bi-sliders"></i> Pengaturan</a>
-<a class="nav-pill" href="#" id="btnLogout">
-  <i class="bi bi-box-arrow-right"></i> Logout
-</a>
+      <!-- RIWAYAT -->
+      <div class="soft-card p-3">
+        <div class="fw-semibold mb-2">Riwayat Grooming (Hari Ini)</div>
+        <table class="table align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Kode</th><th>Pelanggan</th><th>Hewan</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="riwayatHariIni"></tbody>
+        </table>
       </div>
-    </aside>
 
-    <!-- CONTENT -->
-    <section class="content">
-      <header class="topbar">
-        <div class="d-flex align-items-center justify-content-between gap-3">
-          <div>
-            <div class="fw-semibold">Order Grooming</div>
-          </div>
+    </main>
+  </section>
+</div>
 
-          <div class="search position-relative flex-grow-1 d-none d-md-block">
-            <i class="bi bi-search"></i>
-            <input id="searchTop" class="form-control" placeholder="Cari kode grooming / pelanggan / hewan..." />
-          </div>
-
-          <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-light border rounded-3" type="button" title="Notifikasi">
-              <i class="bi bi-bell"></i>
-            </button>
-
-            <div class="dropdown">
-              <button class="btn btn-light border rounded-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-person-circle me-1"></i> Kasir
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#">Profil</a></li>
-                <li><a class="dropdown-item" href="#">Pengaturan</a></li>
-                <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="#" id="btnLogout">Logout</a></li>
-              </ul>
-            </div>
-          </div>
+<!-- MODAL SOP -->
+<div class="modal fade" id="modalSOP" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content" style="border-radius:14px;">
+      <div class="modal-header">
+        <div>
+          <div class="fw-semibold">Checklist SOP Grooming</div>
+          <div class="text-muted small" id="sopInfo">-</div>
         </div>
-      </header>
-
-      <main class="page">
-
-        <!-- 2 CARD SEBELAHAN (Buat Order | Riwayat) -->
-        <div class="row g-3 mb-3">
-          <!-- KIRI -->
-          <div class="col-12 col-lg-6">
-            <div class="card-action stat h-100">
-              <div class="left">
-                <div class="module-icon"><i class="bi bi-scissors"></i></div>
-                <div class="text-truncate">
-                  <p class="title">Order Grooming</p>
-                </div>
-              </div>
-              <a class="btn btn-primary" href="transaksi_grooming.html" id="btnBuatOrder">
-                <i class="bi bi-plus-lg me-1"></i> Buat Order
-              </a>
-            </div>
-          </div>
-
-          <!-- KANAN -->
-          <div class="col-12 col-lg-6">
-            <div class="card-action stat h-100">
-              <div class="left">
-                <div class="module-icon"><i class="bi bi-clock-history"></i></div>
-                <div class="text-truncate">
-                  <p class="title">Riwayat Transaksi Grooming</p>
-                </div>
-              </div>
-              <a class="btn btn-primary" href="riwayat_grooming.html" id="btnRiwayat">
-                <i class="bi bi-eye me-1"></i> Lihat
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- ANTRIAN (ATAS) -->
-        <div class="soft-card p-3 mb-3">
-          <div class="section-title-row mb-2">
-            <div>
-              <div class="fw-semibold">Antrian Grooming</div>
-            </div>
-            <span id="infoAntrian" class="badge text-bg-light border">
-              <i class="bi bi-people-queue me-1"></i> -
-            </span>
-          </div>
-          <div class="d-grid gap-2" id="listAntrian"></div>
-        </div>
-
-        <!-- RIWAYAT TRANSAKSI HARI INI (BAWAH) -->
-        <div class="soft-card p-3 mb-3">
-          <div class="section-title-row mb-2">
-            <div>
-              <div class="fw-semibold">Riwayat Transaksi Grooming (Hari Ini)</div>
-            </div>
-
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-              <span id="infoRiwayat" class="badge text-bg-light border">
-                <i class="bi bi-list-ul me-1"></i> -
-              </span>
-              <a class="btn btn-light border rounded-3 fw-semibold" href="riwayat_grooming.html">
-                <i class="bi bi-clock-history me-1"></i> Riwayat
-              </a>
-            </div>
-          </div>
-
-          <div class="table-responsive">
-            <table class="table align-middle" id="tabelRiwayatGrooming">
-              <thead class="table-light">
-                <tr>
-                  <th>Kode Grooming</th>
-                  <th>Pelanggan</th>
-                  <th>Hewan</th>
-                  <th>Layanan</th>
-                  <th class="text-end">Total</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody><!-- render --></tbody>
-            </table>
-          </div>
-        </div>
-
-        <footer class="text-muted small mt-4">© 2026 Chicko Pet Shop</footer>
-      </main>
-    </section>
-  </div>
-
-  <!-- MODAL DETAIL TRANSAKSI GROOMING -->
-  <div class="modal fade" id="modalDetailGrooming" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content" style="border-radius:14px;">
-        <div class="modal-header">
-          <div>
-            <div class="fw-semibold">Detail Transaksi Grooming</div>
-            <div class="text-muted small" id="gSub">-</div>
-          </div>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-
-        <div class="modal-body">
-          <div class="soft-card p-3 mb-3">
-            <div class="fw-semibold mb-2">Informasi</div>
-            <div class="row g-2">
-              <div class="col-12 col-md-6">
-                <div class="text-muted small">Kode</div>
-                <div class="fw-semibold mono" id="dKode">-</div>
-              </div>
-              <div class="col-12 col-md-6">
-                <div class="text-muted small">Status</div>
-                <div id="dStatus">-</div>
-              </div>
-              <div class="col-12 col-md-6">
-                <div class="text-muted small">Pelanggan</div>
-                <div class="fw-semibold" id="dPelanggan">-</div>
-              </div>
-              <div class="col-12 col-md-6">
-                <div class="text-muted small">Hewan</div>
-                <div class="fw-semibold" id="dHewan">-</div>
-              </div>
-              <div class="col-12 col-md-6">
-                <div class="text-muted small">Layanan</div>
-                <div class="fw-semibold" id="dLayanan">-</div>
-              </div>
-              <div class="col-12 col-md-6">
-                <div class="text-muted small">Total</div>
-                <div class="fw-semibold" id="dTotal">-</div>
-              </div>
-              <div class="col-12 col-md-6">
-                <div class="text-muted small">Metode Bayar</div>
-                <div class="fw-semibold" id="dMetode">-</div>
-              </div>
-              <div class="col-12 col-md-6">
-                <div class="text-muted small">Tanggal</div>
-                <div class="fw-semibold text-muted" id="dTanggal">-</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="soft-card p-3">
-            <div class="fw-semibold mb-2">Catatan</div>
-            <div class="text-muted" id="dCatatan">-</div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal" type="button">Tutup</button>
-        </div>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="sopChecklist" class="d-grid gap-2"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
+        <button class="btn btn-primary" id="btnSimpanSOP">
+          <i class="bi bi-check2-circle me-1"></i> Simpan SOP
+        </button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- JS: Bootstrap -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <script>
-    // ====== Active menu sidebar ======
-    (function setActiveSidebar() {
-      const links = document.querySelectorAll(".nav-pill[href]");
-      const current = (location.pathname.split("/").pop() || "grooming-order.html").toLowerCase();
-      links.forEach((a) => {
-        const href = (a.getAttribute("href") || "").toLowerCase();
-        a.classList.toggle("active", href === current);
-      });
-    })();
+<script>
+/* ================= DATA DUMMY ================= */
+let groomingTrx = [
+  { kode:"GRM-00031", pelanggan:"Rina", hewan:"Kucing - Mochi", status:"Menunggu" },
+  { kode:"GRM-00032", pelanggan:"Dodi", hewan:"Anjing - Bruno", status:"Proses" }
+];
 
-    // ====== format rupiah ======
-    const idr = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" });
-    function rupiah(n) { return idr.format(Number(n || 0)); }
+const SOP = {
+  kucing:[
+    "Pemeriksaan kondisi fisik dan stres",
+    "Memandikan dengan teknik minim stres",
+    "Pengeringan perlahan",
+    "Pembersihan telinga",
+    "Pemotongan kuku",
+    "Finishing & pengecekan akhir"
+  ],
+  anjing:[
+    "Pemeriksaan kondisi fisik",
+    "Memandikan dengan sampo khusus",
+    "Pengeringan dengan blower",
+    "Pemotongan kuku",
+    "Perapian bulu",
+    "Pengecekan akhir"
+  ]
+};
 
-    // ====== badge status ======
-    function statusBadgeHtml(s) {
-      const v = (s || "").toLowerCase();
-      if (v === "selesai") return '<span class="badge badge-selesai">Selesai</span>';
-      if (v === "proses") return '<span class="badge badge-proses">Proses</span>';
-      return '<span class="badge badge-menunggu">Menunggu</span>';
+/* ================= RENDER ================= */
+function badge(s){
+  if(s==="Proses") return '<span class="badge badge-proses">Proses</span>';
+  if(s==="Selesai") return '<span class="badge badge-selesai">Selesai</span>';
+  return '<span class="badge badge-menunggu">Menunggu</span>';
+}
+
+function render(){
+  const q = document.getElementById("listAntrian");
+  const r = document.getElementById("riwayatHariIni");
+  q.innerHTML=""; r.innerHTML="";
+
+  groomingTrx.forEach((t,i)=>{
+    if(t.status!=="Selesai"){
+      q.innerHTML+=`
+        <div class="queue-row">
+          <div>
+            <p class="queue-title">${i+1}. ${t.pelanggan} (${t.hewan})</p>
+            <p class="queue-sub">${t.kode}</p>
+          </div>
+          <button class="btn btn-light border" onclick="openSOP('${t.kode}')">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>`;
     }
 
-    // ====== helpers tanggal hari ini (YYYY-MM-DD) ======
-    function todayISO() {
-      const d = new Date();
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${y}-${m}-${day}`;
-    }
+    r.innerHTML+=`
+      <tr>
+        <td>${t.kode}</td>
+        <td>${t.pelanggan}</td>
+        <td>${t.hewan}</td>
+        <td>${badge(t.status)}</td>
+      </tr>`;
+  });
+}
 
-    // ====== data contoh ======
-    let groomingTrx = [
-      { kode: "GRM-00031", pelanggan: "Rina",  hewan: "Kucing - Mochi", layanan: "Grooming Basic",      total: 60000,  status: "Menunggu", metode: "Kas",  tanggal: "2026-01-06 10:15", catatan: "Alergi parfum kuat." },
-      { kode: "GRM-00032", pelanggan: "Dodi",  hewan: "Anjing - Bruno", layanan: "Grooming Premium",    total: 120000, status: "Proses",   metode: "QRIS", tanggal: "2026-01-06 11:00", catatan: "Minta rapih area kaki." },
-      { kode: "GRM-00033", pelanggan: "Salsa", hewan: "Kucing - Luna",  layanan: "Cukur Bulu",          total: 45000,  status: "Selesai",  metode: "Kartu", tanggal: "2026-01-06 12:05", catatan: "-" },
-      { kode: "GRM-00034", pelanggan: "Bagas", hewan: "Anjing - Kenzo", layanan: "Mandi Kutu + Obat",   total: 90000,  status: "Selesai",  metode: "Kas",  tanggal: "2026-01-06 13:40", catatan: "Tolong dicek kutu di leher." },
-    ];
+/* ================= SOP ================= */
+function openSOP(kode){
+  const t = groomingTrx.find(x=>x.kode===kode);
+  const isKucing = t.hewan.toLowerCase().includes("kucing");
+  const steps = isKucing ? SOP.kucing : SOP.anjing;
 
-    // ====== Render Riwayat (HARI INI) ======
-    function renderRiwayatHariIni(keyword) {
-      const q = (keyword || "").trim().toLowerCase();
-      const today = todayISO();
+  document.getElementById("sopInfo").textContent =
+    `${t.kode} • ${t.pelanggan} • ${t.hewan}`;
 
-      const data = groomingTrx.filter(t => {
-        const sameDay = String(t.tanggal || "").startsWith(today);
-        if (!sameDay) return false;
-        const blob = `${t.kode} ${t.pelanggan} ${t.hewan} ${t.layanan} ${t.status}`.toLowerCase();
-        return q === "" ? true : blob.includes(q);
-      });
+  const wrap = document.getElementById("sopChecklist");
+  wrap.innerHTML="";
+  steps.forEach((s,i)=>{
+    wrap.innerHTML+=`
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="sop${i}">
+        <label class="form-check-label" for="sop${i}">${s}</label>
+      </div>`;
+  });
 
-      const tbody = document.querySelector("#tabelRiwayatGrooming tbody");
-      tbody.innerHTML = "";
+  bootstrap.Modal.getOrCreateInstance(
+    document.getElementById("modalSOP")
+  ).show();
+}
 
-      if (data.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" class="text-muted">Belum ada transaksi grooming hari ini.</td>
-          </tr>
-        `;
-      } else {
-        data.forEach(t => {
-          const tr = document.createElement("tr");
-          tr.className = "row-click";
-          tr.innerHTML = `
-            <td class="fw-semibold mono">${t.kode}</td>
-            <td>${t.pelanggan}</td>
-            <td class="text-muted">${t.hewan}</td>
-            <td>${t.layanan}</td>
-            <td class="text-end fw-semibold">${rupiah(t.total)}</td>
-            <td>${statusBadgeHtml(t.status)}</td>
-          `;
-          tr.addEventListener("click", () => openDetail(t.kode));
-          tbody.appendChild(tr);
-        });
-      }
+document.getElementById("btnSimpanSOP").onclick=function(){
+  alert("Checklist SOP disimpan (simulasi).");
+  bootstrap.Modal.getInstance(document.getElementById("modalSOP")).hide();
+};
 
-      const info = document.getElementById("infoRiwayat");
-      info.innerHTML = q
-        ? `<i class="bi bi-funnel me-1"></i> Hasil: ${data.length} transaksi (hari ini)`
-        : `<i class="bi bi-list-ul me-1"></i> Hari ini: ${data.length} transaksi`;
-    }
-
-    // ====== Render Antrian (Menunggu + Proses) + EDIT STATUS ======
-    function renderAntrian(keyword) {
-      const q = (keyword || "").trim().toLowerCase();
-      const wrap = document.getElementById("listAntrian");
-
-      const rows = groomingTrx.filter(t => {
-        const st = (t.status || "").toLowerCase();
-        const isQueue = (st === "menunggu" || st === "proses");
-        if (!isQueue) return false;
-
-        const blob = `${t.kode} ${t.pelanggan} ${t.hewan} ${t.layanan} ${t.status}`.toLowerCase();
-        return q === "" ? true : blob.includes(q);
-      });
-
-      wrap.innerHTML = "";
-
-      if (rows.length === 0) {
-        wrap.innerHTML = `<div class="text-muted">Belum ada antrian grooming (Menunggu/Proses).</div>`;
-      } else {
-        rows.forEach((t, idx) => {
-          const el = document.createElement("div");
-          el.className = "queue-row";
-
-          el.innerHTML = `
-            <div class="queue-left text-truncate">
-              <p class="queue-title text-truncate">${idx + 1}. ${t.pelanggan} <span class="text-muted">(${t.hewan})</span></p>
-              <p class="queue-sub text-truncate">${t.kode} • ${t.layanan}</p>
-            </div>
-
-            <div class="queue-actions">
-              <button class="btn btn-light border btn-detail-mini" type="button" data-detail="${t.kode}" title="Detail">
-                <i class="bi bi-eye"></i>
-              </button>
-              <div class="d-none d-md-block">${statusBadgeHtml(t.status)}</div>
-              <select class="form-select form-select-sm" data-statusselect="${t.kode}" title="Ubah status">
-                <option value="Menunggu">Menunggu</option>
-                <option value="Proses">Proses</option>
-                <option value="Selesai">Selesai</option>
-              </select>
-            </div>
-          `;
-
-          const sel = el.querySelector(`[data-statusselect="${t.kode}"]`);
-          sel.value = t.status;
-
-          sel.addEventListener("change", () => {
-            const item = groomingTrx.find(x => x.kode === t.kode);
-            if (!item) return;
-
-            item.status = sel.value;
-
-            const key = document.getElementById("searchTop").value;
-            renderAntrian(key);
-            renderRiwayatHariIni(key);
-          });
-
-          el.querySelector(`[data-detail="${t.kode}"]`).addEventListener("click", () => openDetail(t.kode));
-          wrap.appendChild(el);
-        });
-      }
-
-      document.getElementById("infoAntrian").innerHTML =
-        `<i class="bi bi-people-queue me-1"></i> ${rows.length} antrian`;
-    }
-
-    // ====== detail modal ======
-    function openDetail(kode) {
-      const t = groomingTrx.find(x => x.kode === kode);
-      if (!t) return;
-
-      document.getElementById("gSub").textContent =
-        `Klik "Tutup" untuk kembali | ${new Date().toLocaleString("id-ID")}`;
-
-      document.getElementById("dKode").textContent = t.kode;
-      document.getElementById("dPelanggan").textContent = t.pelanggan;
-      document.getElementById("dHewan").textContent = t.hewan;
-      document.getElementById("dLayanan").textContent = t.layanan;
-      document.getElementById("dTotal").textContent = rupiah(t.total);
-      document.getElementById("dMetode").textContent = t.metode;
-      document.getElementById("dTanggal").textContent = t.tanggal;
-      document.getElementById("dStatus").innerHTML = statusBadgeHtml(t.status);
-      document.getElementById("dCatatan").textContent = (t.catatan || "-");
-
-      bootstrap.Modal.getOrCreateInstance(document.getElementById("modalDetailGrooming")).show();
-    }
-
-    // ====== search & refresh ======
-    document.getElementById("searchTop").addEventListener("input", function () {
-      renderAntrian(this.value);
-      renderRiwayatHariIni(this.value);
-    });
-
-    const btnRefresh = document.getElementById("btnRefresh");
-    if (btnRefresh) {
-      btnRefresh.addEventListener("click", () => {
-        const key = document.getElementById("searchTop").value;
-        renderAntrian(key);
-        renderRiwayatHariIni(key);
-      });
-    }
-
-    // ====== init ======
-    renderAntrian("");
-    renderRiwayatHariIni("");
-  </script>
+/* INIT */
+render();
+</script>
 </body>
 </html>
