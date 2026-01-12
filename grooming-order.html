@@ -464,7 +464,7 @@
   <button class="btn btn-primary btn-sm fw-semibold" id="btnSimpanSOP">
     <i class="bi bi-save me-1"></i> Simpan SOP
   </button>
-</div>z
+</div>
 </div>
 <!-- ===== END SOP GROOMING ===== -->
 
@@ -646,37 +646,42 @@ let groomingSOP = {};
 }
 
     // ====== detail modal ======
-    function openDetail(kode) {
-      const t = groomingTrx.find(x => x.kode === kode);
-      if (!t) return;
+function openDetail(kode) {
+  const t = groomingTrx.find(x => x.kode === kode);
+  if (!t) return;
 
-      document.getElementById("gSub").textContent =
-        `Klik "Tutup" untuk kembali | ${new Date().toLocaleString("id-ID")}`;
+  document.getElementById("gSub").textContent =
+    `Klik "Tutup" untuk kembali | ${new Date().toLocaleString("id-ID")}`;
 
-      document.getElementById("dKode").textContent = t.kode;
-      document.getElementById("dPelanggan").textContent = t.pelanggan;
-      document.getElementById("dHewan").textContent = t.hewan;
-      document.getElementById("dLayanan").textContent = t.layanan;
-      document.getElementById("dTotal").textContent = rupiah(t.total);
-      document.getElementById("dMetode").textContent = t.metode;
-      document.getElementById("dTanggal").textContent = t.tanggal;
-      document.getElementById("dStatus").innerHTML = statusBadgeHtml(t.status);
-      document.getElementById("dCatatan").textContent = (t.catatan || "-");
-      renderSOP(kode);
-      /* ======================================================
+  document.getElementById("dKode").textContent = t.kode;
+  document.getElementById("dPelanggan").textContent = t.pelanggan;
+  document.getElementById("dHewan").textContent = t.hewan;
+  document.getElementById("dLayanan").textContent = t.layanan;
+  document.getElementById("dTotal").textContent = rupiah(t.total);
+  document.getElementById("dMetode").textContent = t.metode;
+  document.getElementById("dTanggal").textContent = t.tanggal;
+  document.getElementById("dStatus").innerHTML = statusBadgeHtml(t.status);
+  document.getElementById("dCatatan").textContent = (t.catatan || "-");
+
+  renderSOP(kode);
+
+  bootstrap.Modal
+    .getOrCreateInstance(document.getElementById("modalDetailGrooming"))
+    .show();
+}
+
+
+    /* ======================================================
    ===== SOP GROOMING - SIMPAN & LOAD (localStorage)
    ====================================================== */
 
-// key storage
 const SOP_STORAGE_KEY = "grooming_sop_progress";
 
-// simpan ke localStorage
 function simpanSOP() {
   localStorage.setItem(SOP_STORAGE_KEY, JSON.stringify(groomingSOP));
   alert("Progress SOP berhasil disimpan");
 }
 
-// load dari localStorage
 function loadSOP() {
   const saved = localStorage.getItem(SOP_STORAGE_KEY);
   if (saved) {
@@ -687,6 +692,7 @@ function loadSOP() {
     }
   }
 }
+
 // event tombol simpan SOP
 document.addEventListener("click", function (e) {
   if (e.target.closest("#btnSimpanSOP")) {
@@ -694,9 +700,6 @@ document.addEventListener("click", function (e) {
   }
 });
 
-
-      bootstrap.Modal.getOrCreateInstance(document.getElementById("modalDetailGrooming")).show();
-    }
 
     // ====== search & refresh ======
     document.getElementById("searchTop").addEventListener("input", function () {
