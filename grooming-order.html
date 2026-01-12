@@ -459,6 +459,12 @@
   <div class="text-muted small mt-2">
     ✔ Wajib diceklis oleh karyawan selama proses grooming
   </div>
+  <!-- Tombol Simpan SOP -->
+<div class="d-flex justify-content-end mt-3">
+  <button class="btn btn-primary btn-sm fw-semibold" id="btnSimpanSOP">
+    <i class="bi bi-save me-1"></i> Simpan SOP
+  </button>
+</div>z
 </div>
 <!-- ===== END SOP GROOMING ===== -->
 
@@ -657,6 +663,37 @@ let groomingSOP = {};
       document.getElementById("dStatus").innerHTML = statusBadgeHtml(t.status);
       document.getElementById("dCatatan").textContent = (t.catatan || "-");
       renderSOP(kode);
+      /* ======================================================
+   ===== SOP GROOMING - SIMPAN & LOAD (localStorage)
+   ====================================================== */
+
+// key storage
+const SOP_STORAGE_KEY = "grooming_sop_progress";
+
+// simpan ke localStorage
+function simpanSOP() {
+  localStorage.setItem(SOP_STORAGE_KEY, JSON.stringify(groomingSOP));
+  alert("Progress SOP berhasil disimpan");
+}
+
+// load dari localStorage
+function loadSOP() {
+  const saved = localStorage.getItem(SOP_STORAGE_KEY);
+  if (saved) {
+    try {
+      groomingSOP = JSON.parse(saved);
+    } catch (e) {
+      groomingSOP = {};
+    }
+  }
+}
+// event tombol simpan SOP
+document.addEventListener("click", function (e) {
+  if (e.target.closest("#btnSimpanSOP")) {
+    simpanSOP();
+  }
+});
+
 
       bootstrap.Modal.getOrCreateInstance(document.getElementById("modalDetailGrooming")).show();
     }
@@ -676,9 +713,11 @@ let groomingSOP = {};
       });
     }
 
-    // ====== init ======
-    renderAntrian("");
-    renderRiwayatHariIni("");
+// ====== init ======
+loadSOP();
+renderAntrian("");
+renderRiwayatHariIni("");
+
   </script>
 </body>
 </html>
