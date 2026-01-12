@@ -541,7 +541,6 @@ let groomingSOP = {};
 
       const data = groomingTrx.filter(t => {
         const sameDay = String(t.tanggal || "").startsWith(today);
-        if (!sameDay) return false;
         const blob = `${t.kode} ${t.pelanggan} ${t.hewan} ${t.layanan} ${t.status}`.toLowerCase();
         return q === "" ? true : blob.includes(q);
       });
