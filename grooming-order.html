@@ -644,6 +644,47 @@ let groomingSOP = {};
     `<i class="bi bi-people-queue me-1"></i> ${rows.length} antrian`;
 }
 
+function renderSOP(kode) {
+  if (!groomingSOP[kode]) {
+    groomingSOP[kode] = SOP_LIST.map(text => ({
+      text,
+      done: false
+    }));
+  }
+
+  const data = groomingSOP[kode];
+  const wrap = document.getElementById("sopList");
+  const progress = document.getElementById("sopProgress");
+
+  if (!wrap || !progress) return;
+
+  wrap.innerHTML = "";
+
+  let selesai = 0;
+
+  data.forEach(item => {
+    if (item.done) selesai++;
+
+    const label = document.createElement("label");
+    label.className = "d-flex align-items-center gap-2";
+
+    label.innerHTML = `
+      <input class="form-check-input" type="checkbox" ${item.done ? "checked" : ""}>
+      <span>${item.text}</span>
+    `;
+
+    label.querySelector("input").addEventListener("change", e => {
+      item.done = e.target.checked;
+      renderSOP(kode);
+    });
+
+    wrap.appendChild(label);
+  });
+
+  progress.textContent = Math.round((selesai / data.length) * 100) + "%";
+}
+
+
     // ====== detail modal ======
 function openDetail(kode) {
   const t = groomingTrx.find(x => x.kode === kode);
